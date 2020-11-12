@@ -1,8 +1,4 @@
 
-# Include all settings from the root terragrunt.hcl file
-include {
-  path = find_in_parent_folders()
-}
 
 locals {
   # Automatically load region-level variables
@@ -31,8 +27,8 @@ dependency "vpc" {
   # module hasn't been applied yet.
   mock_outputs_allowed_terraform_commands = ["validate"]
   mock_outputs = {
-    network    = "fake-network"
-    subnetwork = "fake-subnetwork"
+    network_name    = "fake-network"
+    subnets_names = ["fake-subnetwork"]
   }
 }
 
@@ -40,6 +36,13 @@ terraform {
 
   source = "git::https://github.com/terraform-google-modules/terraform-google-kubernetes-engine.git?ref=v12.0.0"
 }
+
+# Include all settings from the root terragrunt.hcl file
+include {
+  path = find_in_parent_folders()
+}
+
+
 
 inputs = {
 

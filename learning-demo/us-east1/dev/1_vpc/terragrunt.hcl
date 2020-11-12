@@ -1,8 +1,4 @@
 
-# Include all settings from the root terragrunt.hcl file
-include {
-  path = find_in_parent_folders()
-}
 
 locals {
 
@@ -26,6 +22,11 @@ locals {
 terraform {
 
   source = "git::https://github.com/terraform-google-modules/terraform-google-network.git?ref=v2.5.0"
+}
+
+# Include all settings from the root terragrunt.hcl file
+include {
+  path = find_in_parent_folders()
 }
 
 

@@ -1,7 +1,4 @@
-# Include all settings from the root terragrunt.hcl file
-include {
-  path = find_in_parent_folders()
-}
+
 
 
 dependency "gke" {
@@ -14,6 +11,11 @@ dependency "gke" {
   mock_outputs = {
     name = "fake"
   }
+}
+
+# Include all settings from the root terragrunt.hcl file
+include {
+  path = find_in_parent_folders()
 }
 
 terraform {

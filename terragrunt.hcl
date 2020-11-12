@@ -46,6 +46,28 @@ generate "provider" {
 EOF
 }
 
+# Configure terraform state to be stored in GCS,
+remote_state {
+  disable_init = tobool(get_env("TERRAGRUNT_DISABLE_INIT", "false"))
+  backend = "gcs"
+  generate = {
+    path      = "backend.tf"
+    if_exists = "overwrite_terragrunt"
+  }
+
+  config = {
+    project  = local.project_id
+    location = "eu"
+    bucket   = "${get_env("TG_BUCKET_PREFIX", "")}terragrunt-terraform-state-${local.project_id}-${local.region}"
+    prefix   = "${path_relative_to_include()}/terraform.tfstate"
+
+    gcs_bucket_labels = {
+      owner = "terragrunt"
+      name  = "terraform"
+    }
+    
+  }
+}
 
 
 # ---------------------------------------------------------------------------------------------------------------------
