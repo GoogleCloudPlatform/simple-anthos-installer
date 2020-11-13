@@ -1,0 +1,13 @@
+# In this directory, run the following command to build this builder.
+# $ gcloud builds submit . --config=cloudbuild.yaml
+steps:
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.13.5-0.26.2'
+    args: ['validate-all']
+    env:
+      - "TF_IN_AUTOMATION=1"
+      - "TF_INPUT=false"
+      - "TF_VAR_project_id=${PROJECT_ID}"
+      - "TERRAGRUNT_DISABLE_INIT=true"
+      - "CLOUDSDK_CORE_PROJECT=${PROJECT_ID}"
+    dir: non-prod
+tags: ['cloud-builders-community']
