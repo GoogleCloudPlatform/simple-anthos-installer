@@ -62,8 +62,8 @@ remote_state {
     prefix   = "${path_relative_to_include()}/terraform.tfstate"
 
     gcs_bucket_labels = {
-      owner = "terragrunt"
-      name  = "terraform"
+      owner = "${local.project_id}"
+      name  = "anthos-edgeML-demo"
     }
     
   }

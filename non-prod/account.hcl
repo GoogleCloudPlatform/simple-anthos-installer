@@ -2,4 +2,5 @@
 # feed forward to the child modules.
 locals {
   project_id = get_env("CLOUDSDK_CORE_PROJECT") # GCP Project name
+  
 }
