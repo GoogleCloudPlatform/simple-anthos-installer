@@ -1,0 +1,63 @@
+pply complete! Resources: 54 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+cluster_endpoint = https://FD6B9B307BC87242425DAA14AB7219EB.gr7.us-east-2.eks.amazonaws.com
+cluster_id = gagantrial-eks-qanFZgUu
+cluster_name = gagantrial-eks-qanFZgUu
+cluster_security_group_id = sg-0bc806f23aa3cd451
+config_map_aws_auth = [
+  {
+    "data" = {
+      "mapAccounts" = "[]\n"
+      "mapRoles" = "- \"groups\":\n  - \"system:bootstrappers\"\n  - \"system:nodes\"\n  \"rolearn\": \"arn:aws:iam::126285863215:role/gagantrial-eks-qanFZgUu2020111616101860090000000c\"\n  \"username\": \"system:node:{{EC2PrivateDNSName}}\"\n"
+      "mapUsers" = "[]\n"
+    }
+    "id" = "kube-system/aws-auth"
+    "metadata" = [
+      {
+        "generate_name" = ""
+        "generation" = 0
+        "labels" = {
+          "app.kubernetes.io/managed-by" = "Terraform"
+          "terraform.io/module" = "terraform-aws-modules.eks.aws"
+        }
+        "name" = "aws-auth"
+        "namespace" = "kube-system"
+        "resource_version" = "847"
+        "self_link" = "/api/v1/namespaces/kube-system/configmaps/aws-auth"
+        "uid" = "221bed58-445f-4ef8-a25d-183c8b2bd47f"
+      },
+    ]
+  },
+]
+kubectl_config = apiVersion: v1
+preferences: {}
+kind: Config
+
+clusters:
+- cluster:
+    server: https://FD6B9B307BC87242425DAA14AB7219EB.gr7.us-east-2.eks.amazonaws.com
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJd01URXhOakUyTURVeU9Gb1hEVE13TVRFeE5ERTJNRFV5T0Zvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBSzd0CmlYWUxtL0NxSW9TbzVlYjM3ZGM0WnMyRUxLVlFMdjB2Nk4yM3ppU0t0dGg3bWJTOXU1bUwyVExsTnlXSStKL1oKbVQ5MFZBbW5tSVRNSDVyaytXTEpCMmx6QlRYemdhWXZWRElqbXZ0anVJYUhpa0kzNWowbHNIblRIQ3pFazFLTAozMWxmTzNVbGxiUjlnY2VHYm9ybjJUT2orVWFJOE0zS2JHaEM5Smk0TWUwcWFuOGNzRDFYc1E1bDYrZm1tdXVoCjg5R3Z1UWxFeEpCZVhvb01wN0RwV1JPckFiMWpwbVBtak00b056N1NSQWdJanNIQ3pDWWJtN3BnWTNyYTVvdXYKWG9lZ2J2ekJrOTNJZklQdEVJTnM2KzZ1YU9JZXdFTVBKblFFb0l6MjRZVFFrQktXaFp6R2wvV0hHYlJtRzNOdgpIUlM3NGtBZTBLWmZweXFsZng4Q0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFHeE1WV0JPMEJ0Y3hCMlphN2hOSGdJY3F3MTUKZU45SnRlaVNGaXBvRU16a3I4WHFxaDFVc1hZd2tpclY3Yy9KL09OM3RoSjl4VDBCUmN1cUYyRSt0V21MMGVITwpuN0ZKWGR4ejM1UndpazRTYnBCUHE5U01LY3l3Ym9rSUJYbWZteTVlaFkvcWZwTjJCRENadVpOdXRRZ2V4ZUpVCktWb29ZRnMyM0IvZWFTd0o2Tnpub2tuaFE0V3pwQUNPclZEQnJCMEdDSHZjYkU0bmM1ZzhxSzdXMG93ZFZ3ckQKSDRrN2p0VDBPSFhTclpPT0NydVFRcm80R3NOZStSeE84TW1hczFmZW1yUmIyeVMwT1NpczBab1FpVUl3SzZpWgoxeEtEZTFQcHlramdCYmRzVElPSkxJOHhZV3VFVGMzeHVSN2xVcWY2SlpYSnlVS09zSGY1VUhwTEVOWT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+  name: eks_gagantrial-eks-qanFZgUu
+
+contexts:
+- context:
+    cluster: eks_gagantrial-eks-qanFZgUu
+    user: eks_gagantrial-eks-qanFZgUu
+  name: eks_gagantrial-eks-qanFZgUu
+
+current-context: eks_gagantrial-eks-qanFZgUu
+
+users:
+- name: eks_gagantrial-eks-qanFZgUu
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1alpha1
+      command: aws-iam-authenticator
+      args:
+        - "token"
+        - "-i"
+        - "gagantrial-eks-qanFZgUu"
+
+region = us-east-2
