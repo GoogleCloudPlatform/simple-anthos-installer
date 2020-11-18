@@ -4,4 +4,5 @@
 locals {
   region             = "us-central1"
   availability_zones = ["us-central1-b", "us-central1-c", "us-central1-a"]
+  aws_region = "us-east-1" #AWS Region
 }
