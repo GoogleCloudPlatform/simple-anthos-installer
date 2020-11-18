@@ -1,4 +1,19 @@
 
+# Include all settings from the root terragrunt.hcl file
+include {
+  path = find_in_parent_folders()
+}
+
+generate "backend" {
+  path      = "backend.tf"
+  if_exists = "overwrite"
+  contents  = <<-EOF
+    terraform {
+      backend "gcs" {}
+    }
+  EOF
+}
+
 
 locals {
 
@@ -21,14 +36,8 @@ locals {
 
 terraform {
 
-  source = "git::https://github.com/terraform-google-modules/terraform-google-network.git?ref=v2.5.0"
+  source = "github.com/terraform-google-modules/terraform-google-network.git?ref=v2.5.0"
 }
-
-# Include all settings from the root terragrunt.hcl file
-include {
-  path = find_in_parent_folders()
-}
-
 
 inputs = {
 

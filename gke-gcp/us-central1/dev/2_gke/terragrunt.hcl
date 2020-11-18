@@ -1,4 +1,18 @@
 
+# Include all settings from the root terragrunt.hcl file
+include {
+  path = find_in_parent_folders()
+}
+
+generate "backend" {
+  path      = "backend.tf"
+  if_exists = "overwrite"
+  contents  = <<-EOF
+    terraform {
+      backend "gcs" {}
+    }
+  EOF
+}
 
 locals {
   # Automatically load region-level variables
@@ -15,7 +29,7 @@ locals {
 
   #Subnets for GKE
   subnet_01    = "${local.environment_name}-${local.region}-subnet-01"
-  cluster_type = "simple-regional"
+  cluster_type = "gke-regional"
 
 }
 
@@ -34,14 +48,8 @@ dependency "vpc" {
 
 terraform {
 
-  source = "git::https://github.com/terraform-google-modules/terraform-google-kubernetes-engine.git?ref=v12.0.0"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git?ref=v12.1.0"
 }
-
-# Include all settings from the root terragrunt.hcl file
-include {
-  path = find_in_parent_folders()
-}
-
 
 
 inputs = {

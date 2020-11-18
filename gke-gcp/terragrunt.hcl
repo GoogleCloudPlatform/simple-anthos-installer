@@ -16,7 +16,7 @@ locals {
   # Extract the variables we need for easy access
   project_id         = local.account_vars.locals.project_id
   region             = local.region_vars.locals.region
-  availability_zones = local.region_vars.locals.availability_zones
+  environment_name   = local.environment_vars.locals.environment_name
 
 }
 
@@ -49,23 +49,18 @@ EOF
 # Configure terraform state to be stored in GCS,
 remote_state {
   disable_init = tobool(get_env("TERRAGRUNT_DISABLE_INIT", "false"))
-  backend = "gcs"
-  generate = {
-    path      = "backend.tf"
-    if_exists = "overwrite_terragrunt"
-  }
-
+  backend      = "gcs"
   config = {
     project  = local.project_id
-    location = "eu"
-    bucket   = "${get_env("TG_BUCKET_PREFIX", "")}terragrunt-terraform-state-${local.project_id}-${local.region}"
+    location = local.region
+    bucket   = "terraform-state-${local.environment_name}-${local.project_id}-${local.region}"
     prefix   = "${path_relative_to_include()}/terraform.tfstate"
 
     gcs_bucket_labels = {
       owner = "${local.project_id}"
-      name  = "anthos-edgeML-demo"
+      name  = "${local.environment_name}"
     }
-    
+
   }
 }
 

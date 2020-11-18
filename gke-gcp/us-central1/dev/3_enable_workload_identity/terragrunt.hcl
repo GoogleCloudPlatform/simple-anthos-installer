@@ -1,5 +1,18 @@
 
+# Include all settings from the root terragrunt.hcl file
+include {
+  path = find_in_parent_folders()
+}
 
+generate "backend" {
+  path      = "backend.tf"
+  if_exists = "overwrite"
+  contents  = <<-EOF
+    terraform {
+      backend "gcs" {}
+    }
+  EOF
+}
 
 dependency "gke" {
 
@@ -13,14 +26,9 @@ dependency "gke" {
   }
 }
 
-# Include all settings from the root terragrunt.hcl file
-include {
-  path = find_in_parent_folders()
-}
-
 terraform {
 
-  source = "git::https://github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/workload-identity?ref=v12.0.0"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/workload-identity?ref=v12.1.0"
 }
 
 inputs = {

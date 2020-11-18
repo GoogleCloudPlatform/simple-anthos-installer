@@ -1,4 +1,18 @@
 
+# Include all settings from the root terragrunt.hcl file
+include {
+  path = find_in_parent_folders()
+}
+
+generate "backend" {
+  path      = "backend.tf"
+  if_exists = "overwrite"
+  contents  = <<-EOF
+    terraform {
+      backend "gcs" {}
+    }
+  EOF
+}
 
 dependency "gke" {
 
@@ -16,12 +30,7 @@ dependency "gke" {
 
 terraform {
 
-  source = "git::https://github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/acm?ref=v12.0.0"
-}
-
-# Include all settings from the root terragrunt.hcl file
-include {
-  path = find_in_parent_folders()
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/hub?ref=v12.1.0"
 }
 
 
@@ -31,9 +40,6 @@ inputs = {
   cluster_name     = dependency.gke.outputs.name
   location         = dependency.gke.outputs.location
   cluster_endpoint = dependency.gke.outputs.endpoint
-
-  sync_repo   = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
-  sync_branch = "1.0.0"
-  policy_dir  = "foo-corp"
+  gke_hub_membership_name = dependency.gke.outputs.name
 
 }

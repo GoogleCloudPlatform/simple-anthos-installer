@@ -1,29 +1,32 @@
+
+
+
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
-  cluster_name    = local.cluster_name
+  cluster_name    = var.cluster_name
   cluster_version = "1.17"
-  subnets         = module.vpc.private_subnets
+  subnets         = var.private_subnets
 
   tags = {
-    Environment = "gagantrial"
+    Environment = var.cluster_name
     GithubRepo  = "terraform-aws-eks"
     GithubOrg   = "terraform-aws-modules"
   }
 
-  vpc_id = module.vpc.vpc_id
+  vpc_id = var.vpc_id
 
   worker_groups = [
     {
       name                          = "worker-group-1"
       instance_type                 = "t2.small"
-      additional_userdata           = "gagan trial anthos"
+      additional_userdata           = var.cluster_name
       asg_desired_capacity          = 2
       additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
     },
     {
       name                          = "worker-group-2"
       instance_type                 = "t2.medium"
-      additional_userdata           = "gagan trial anthos"
+      additional_userdata           = var.cluster_name
       additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
       asg_desired_capacity          = 1
     },
