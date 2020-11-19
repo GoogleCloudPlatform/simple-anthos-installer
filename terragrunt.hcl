@@ -67,7 +67,7 @@ EOF
 
 # Configure terraform state to be stored in GCS,
 remote_state {
-  disable_init = tobool(get_env("TERRAGRUNT_DISABLE_INIT", "false"))
+  # disable_init = tobool(get_env("TERRAGRUNT_DISABLE_INIT", "false"))
   backend      = "gcs"
   config = {
     project  = local.project_id
