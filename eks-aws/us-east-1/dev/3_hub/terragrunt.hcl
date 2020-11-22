@@ -56,7 +56,7 @@ terraform {
   # Before apply and plan to set the current kubetctl context to the eks cluster
   before_hook "before_hook_1" {
     commands     = ["apply", "plan"]
-    execute      = ["aws", "eks","--region", "${local.aws_region}", "update-kubeconfig", "--name", "${dependency.eks.outputs.cluster_name}"]
+    execute      = ["aws", "eks","--region", "${local.aws_region}", "update-kubeconfig", "--name", coalesce("${dependency.eks.outputs.cluster_name}","placeholder")]
   }
 
 }
