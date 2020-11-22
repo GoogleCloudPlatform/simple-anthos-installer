@@ -13,10 +13,9 @@ generate "backend" {
   EOF
 }
 
-
 locals {
 
-# Automatically load project-level variables
+  # Automatically load project-level variables
   account_vars = read_terragrunt_config(find_in_parent_folders("account.hcl"))
 
   # Automatically load region-level variables
@@ -32,32 +31,41 @@ locals {
   project_id = local.account_vars.locals.project_id
 
 }
+dependency "eks" {
 
-dependency "vpc" {
-
-  config_path = "../1_vpc"
+  config_path = "../2_eks"
 
   # Configure mock outputs for the `validate` command that are returned when there are no outputs available (e.g the
   # module hasn't been applied yet.
   mock_outputs_allowed_terraform_commands = ["validate"]
   mock_outputs = {
-   
-    private_subnets = ["fake"]
-    vpc_id = ["fake"]
+
+    cluster_name            = ["fake"]
+    cluster_endpoint        = ["fake"]
+    region                  = ["fake"]
+    cluster_endpoint        = ["fake"]
+    kubeconfig              = ["fake"]
+    gke_hub_membership_name = ["fake"]
   }
 }
 
 terraform {
 
-  source = "../../../terraform/eks/"
+  source = "../../../terraform/hub_eks/"
+
+  # Before apply and plan to set the current kubetctl context to the eks cluster
+  before_hook "before_hook_1" {
+    commands     = ["apply", "plan"]
+    execute      = ["aws", "eks","--region", "${local.aws_region}", "update-kubeconfig", "--name", "${dependency.eks.outputs.cluster_name}"]
+  }
 
 }
 
 inputs = {
-
-    aws_region = local.aws_region
-    #Include the GCP project name in naming the resources so we know which GCP project created it
-    cluster_name = "remote-${local.environment_name}-${local.project_id}-1"
-    vpc_id = dependency.vpc.outputs.vpc_id
-    private_subnets = dependency.vpc.outputs.private_subnets
+  cluster_name            = dependency.eks.outputs.cluster_name
+  region                  = dependency.eks.outputs.region
+  cluster_endpoint        = dependency.eks.outputs.cluster_endpoint
+  kubeconfig              = dependency.eks.outputs.kubeconfig
+  gke_hub_membership_name = dependency.eks.outputs.cluster_name
+  project_id              = local.project_id
 }

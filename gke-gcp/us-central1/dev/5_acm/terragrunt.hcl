@@ -29,6 +29,10 @@ dependency "gke" {
   }
 }
 
+dependencies {
+  paths = ["../3_workload_identity", "../4_hub"]
+}
+
 terraform {
 
   source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/acm?ref=v12.1.0"

@@ -3,7 +3,7 @@ variable "aws_region" {
 }
 
 variable "environment_name" {
-  description = "Environment Name"
+  description = "Environment Name used to name resources"
 }
 
 
@@ -14,7 +14,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.64.0"
 
-  name                 = "${var.environment_name}-vpc"
+  name                 = "vpc-${var.environment_name}"
   cidr                 = "10.0.0.0/16"
   azs                  = data.aws_availability_zones.available.names
   private_subnets      = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]

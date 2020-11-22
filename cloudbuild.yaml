@@ -1,7 +1,7 @@
 # In this directory, run the following command to build this builder.
 # $ gcloud builds submit . --config=cloudbuild.yaml
 steps:
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.13.5-0.26.2'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.9-0.19.25'
     args: ['validate-all']
     env:
       - "TF_IN_AUTOMATION=1"
@@ -10,7 +10,7 @@ steps:
       - "TERRAGRUNT_DISABLE_INIT=true"
       - "PROJECT_ID=${PROJECT_ID}" 
     dir: gke-gcp
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.13.5-0.26.2'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.9-0.19.25'
     args: ['validate-all']
     env:
       - "TF_IN_AUTOMATION=1"

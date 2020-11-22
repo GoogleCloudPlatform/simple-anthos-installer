@@ -14,6 +14,10 @@ generate "backend" {
   EOF
 }
 
+dependencies {
+  paths = ["../3_workload_identity"]
+}
+
 dependency "gke" {
 
   config_path = "../2_gke"
