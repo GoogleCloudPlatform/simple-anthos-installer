@@ -18,6 +18,5 @@ steps:
       - "TF_VAR_project_id=${PROJECT_ID}"
       - "TERRAGRUNT_DISABLE_INIT=true"
       - "PROJECT_ID=${PROJECT_ID}" 
-      - "VALIDATE_ONLY_PLACEHOLDER=dummy"
     dir: eks-aws
 tags: ['cloud-builders-community']
