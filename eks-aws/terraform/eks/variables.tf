@@ -12,7 +12,7 @@ variable "vpc_id" {
 
 variable "private_subnets" {
   description = "Private subnet array"
-  type = list(string)
+  type        = list(string)
 }
 
 

@@ -16,7 +16,7 @@ generate "backend" {
 
 locals {
 
-# Automatically load project-level variables
+  # Automatically load project-level variables
   account_vars = read_terragrunt_config(find_in_parent_folders("account.hcl"))
 
   # Automatically load region-level variables
@@ -41,9 +41,9 @@ dependency "vpc" {
   # module hasn't been applied yet.
   mock_outputs_allowed_terraform_commands = ["validate"]
   mock_outputs = {
-   
+
     private_subnets = ["fake"]
-    vpc_id = ["fake"]
+    vpc_id          = ["fake"]
   }
 }
 
@@ -55,9 +55,9 @@ terraform {
 
 inputs = {
 
-    aws_region = local.aws_region
-    #Include the GCP project name in naming the resources so we know which GCP project created it
-    cluster_name = "remote-${local.environment_name}-${local.project_id}-1"
-    vpc_id = dependency.vpc.outputs.vpc_id
-    private_subnets = dependency.vpc.outputs.private_subnets
+  aws_region = local.aws_region
+  #Include the GCP project name in naming the resources so we know which GCP project created it
+  cluster_name    = "remote-${local.environment_name}-${local.project_id}-1"
+  vpc_id          = dependency.vpc.outputs.vpc_id
+  private_subnets = dependency.vpc.outputs.private_subnets
 }

@@ -31,8 +31,9 @@ locals {
   project_id = local.account_vars.locals.project_id
 
   cluster_name = "remote-${local.environment_name}-${local.project_id}-1"
-
 }
+
+
 dependency "eks" {
 
   config_path = "../2_eks"
@@ -53,12 +54,12 @@ dependency "eks" {
 
 terraform {
 
-  source = "../../../terraform/hub_eks/"
+  source = "../../../terraform/hub_k8s/"
 
   # Before apply and plan to set the current kubetctl context to the eks cluster
   before_hook "before_hook_1" {
-    commands     = ["apply", "plan"]
-    execute      = ["aws", "eks","--region", "${local.aws_region}", "update-kubeconfig", "--name", "${local.cluster_name}"]
+    commands = ["apply", "plan"]
+    execute  = ["aws", "eks", "--region", "${local.aws_region}", "update-kubeconfig", "--name", "${local.cluster_name}"]
   }
 
 }
@@ -70,4 +71,7 @@ inputs = {
   kubeconfig              = dependency.eks.outputs.kubeconfig
   gke_hub_membership_name = dependency.eks.outputs.cluster_name
   project_id              = local.project_id
+  labels                  = "environ=${local.environment_name},infra=eks"
+
 }
+

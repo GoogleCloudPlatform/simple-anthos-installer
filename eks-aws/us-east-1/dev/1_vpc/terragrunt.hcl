@@ -16,7 +16,7 @@ generate "backend" {
 
 locals {
 
-# Automatically load project-level variables
+  # Automatically load project-level variables
   account_vars = read_terragrunt_config(find_in_parent_folders("account.hcl"))
 
   # Automatically load region-level variables
@@ -41,7 +41,7 @@ terraform {
 
 inputs = {
 
-    aws_region = local.aws_region
-    #Include the GCP project name in naming the resources so we know which GCP project created it
-    environment_name = "${local.environment_name}-gcp:${local.project_id}"
+  aws_region = local.aws_region
+  #Include the GCP project name in naming the resources so we know which GCP project created it
+  environment_name = "${local.environment_name}-gcp:${local.project_id}"
 }

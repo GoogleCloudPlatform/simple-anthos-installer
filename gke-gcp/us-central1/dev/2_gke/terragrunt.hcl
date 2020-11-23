@@ -41,7 +41,7 @@ dependency "vpc" {
   # module hasn't been applied yet.
   mock_outputs_allowed_terraform_commands = ["validate"]
   mock_outputs = {
-    network_name    = "fake-network"
+    network_name  = "fake-network"
     subnets_names = ["fake-subnetwork"]
   }
 }

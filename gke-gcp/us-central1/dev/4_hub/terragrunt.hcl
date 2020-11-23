@@ -41,9 +41,11 @@ terraform {
 inputs = {
 
 
-  cluster_name     = dependency.gke.outputs.name
-  location         = dependency.gke.outputs.location
-  cluster_endpoint = dependency.gke.outputs.endpoint
+  cluster_name            = dependency.gke.outputs.name
+  location                = dependency.gke.outputs.location
+  cluster_endpoint        = dependency.gke.outputs.endpoint
   gke_hub_membership_name = dependency.gke.outputs.name
+  gke_hub_sa_name         = "gke-hub-sa-2"
+
 
 }
