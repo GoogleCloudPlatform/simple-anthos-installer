@@ -69,7 +69,7 @@ inputs = {
       autoscaling  = false
       auto_upgrade = true
       # Try to set  node pool to 4 for ACM to prevent against test flakiness
-      node_count   = 2
+      node_count   = 1
       machine_type = "e2-standard-4"
     },
   ]

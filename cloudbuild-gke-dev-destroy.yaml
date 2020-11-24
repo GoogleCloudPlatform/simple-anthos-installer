@@ -1,4 +1,4 @@
-# Creates GKE Clusters and regiters them with Anthos
+# Calls delete all and cleans up anything afterwards
 #In this directory, run the following command to build this builder.
 # $ gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
 steps:
@@ -12,4 +12,10 @@ steps:
       - "ENVIRONMENT_NAME=dev"
       - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
     dir: gke-gcp
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: 'bash'
+    args: [ '-c', "gcloud secrets versions access latest --secret=gcp-sa-leftovers --format='get(payload.data)' | tr '_-' '/+' | base64 -d > gcp-sa-leftovers.json" ]
+  - name: gcr.io/${PROJECT_ID}/leftovers
+    entrypoint: 'bash'
+    args: [ '-c', "leftovers -i=gcp -f=${ENVIRONMENT_NAME} --gcp-service-account-key=gcp-sa-leftovers.json -n" ]
 tags: ['cloud-builders-community']
