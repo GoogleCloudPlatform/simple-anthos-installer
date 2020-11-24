@@ -1,9 +1,9 @@
 #  Creates EKS Clusters and regiters them with Anthos
 #In this directory, run the following command to build this builder.
-# $ gcloud builds submit . --config=cloudbuild-eks-dev-deploy.yaml
+# $ gcloud builds submit . --config=cloudbuild-eks-dev-deploy.yaml --timeout=30m
 steps:
   - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.2-awscli'
-    args: ['apply','--terragrunt-non-interactive']
+    args: ['apply-all','--terragrunt-non-interactive']
     env:
       - "TF_IN_AUTOMATION=1"
       - "TF_INPUT=false"
@@ -12,7 +12,7 @@ steps:
       - "ENVIRONMENT_NAME=dev"
     dir: eks-aws/us-east-1/dev/1_vpc
   - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.2-awscli'
-    args: ['apply','--terragrunt-non-interactive']
+    args: ['apply-all','--terragrunt-non-interactive']
     env:
       - "TF_IN_AUTOMATION=1"
       - "TF_INPUT=false"
@@ -21,7 +21,7 @@ steps:
       - "ENVIRONMENT_NAME=dev" 
     dir: eks-aws/us-east-1/dev/2_eks
   - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.2-awscli'
-    args: ['apply','--terragrunt-non-interactive']
+    args: ['apply-all','--terragrunt-non-interactive']
     env:
       - "TF_IN_AUTOMATION=1"
       - "TF_INPUT=false"
@@ -30,7 +30,7 @@ steps:
       - "ENVIRONMENT_NAME=dev"
     dir: eks-aws/us-east-1/dev/3_hub
   - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.2-awscli'
-    args: ['apply','--terragrunt-non-interactive']
+    args: ['apply-all','--terragrunt-non-interactive']
     env:
       - "TF_IN_AUTOMATION=1"
       - "TF_INPUT=false"
