@@ -1,0 +1,50 @@
+#  Calls terragrunt validate-all on all modules
+#In this directory, run the following command to build this builder.
+# $ gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml
+steps:
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
+    args: ['apply']
+    env:
+      - "TF_IN_AUTOMATION=1"
+      - "TF_INPUT=false"
+      - "TF_VAR_project_id=${PROJECT_ID}"
+      - "PROJECT_ID=${PROJECT_ID}"
+      - "ENVIRONMENT_NAME=dev"
+    dir: gke-gcp/us-central1/dev/1_vpc
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
+    args: ['apply']
+    env:
+      - "TF_IN_AUTOMATION=1"
+      - "TF_INPUT=false"
+      - "TF_VAR_project_id=${PROJECT_ID}"
+      - "PROJECT_ID=${PROJECT_ID}"
+      - "ENVIRONMENT_NAME=dev" 
+    dir: gke-gcp/us-central1/dev/2_gke
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
+    args: ['apply']
+    env:
+      - "TF_IN_AUTOMATION=1"
+      - "TF_INPUT=false"
+      - "TF_VAR_project_id=${PROJECT_ID}"
+      - "PROJECT_ID=${PROJECT_ID}" 
+      - "ENVIRONMENT_NAME=dev"
+    dir: gke-gcp/us-central1/dev/3_workload_identity
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
+    args: ['apply']
+    env:
+      - "TF_IN_AUTOMATION=1"
+      - "TF_INPUT=false"
+      - "TF_VAR_project_id=${PROJECT_ID}"
+      - "PROJECT_ID=${PROJECT_ID}" 
+      - "ENVIRONMENT_NAME=dev"
+    dir: gke-gcp/us-central1/dev/4_hub
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
+    args: ['apply']
+    env:
+      - "TF_IN_AUTOMATION=1"
+      - "TF_INPUT=false"
+      - "TF_VAR_project_id=${PROJECT_ID}"
+      - "PROJECT_ID=${PROJECT_ID}"
+      - "ENVIRONMENT_NAME=dev" 
+    dir: gke-gcp/us-central1/dev/5_acm
+tags: ['cloud-builders-community']

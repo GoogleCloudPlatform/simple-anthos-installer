@@ -1,7 +1,8 @@
-# In this directory, run the following command to build this builder.
+#  Calls terragrunt validate-all on all modules
+#In this directory, run the following command to build this builder.
 # $ gcloud builds submit . --config=cloudbuild.yaml
 steps:
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.2'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
     args: ['validate-all']
     env:
       - "TF_IN_AUTOMATION=1"
@@ -9,6 +10,7 @@ steps:
       - "TF_VAR_project_id=${PROJECT_ID}"
       - "TERRAGRUNT_DISABLE_INIT=true"
       - "PROJECT_ID=${PROJECT_ID}" 
+      - "ENVIRONMENT_NAME=validate" 
     dir: gke-gcp
   - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.2-awscli'
     args: ['validate-all']
@@ -18,5 +20,6 @@ steps:
       - "TF_VAR_project_id=${PROJECT_ID}"
       - "TERRAGRUNT_DISABLE_INIT=true"
       - "PROJECT_ID=${PROJECT_ID}" 
+      - "ENVIRONMENT_NAME=validate" 
     dir: eks-aws
 tags: ['cloud-builders-community']
