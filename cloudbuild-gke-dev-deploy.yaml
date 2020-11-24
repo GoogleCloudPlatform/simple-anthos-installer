@@ -1,4 +1,4 @@
-#  Calls terragrunt validate-all on all modules
+# Creates GKE Clusters and regiters them with Anthos
 #In this directory, run the following command to build this builder.
 # $ gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml
 steps:
