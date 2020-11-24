@@ -33,7 +33,7 @@ terraform {
 
 inputs = {
 
-  name                = "iden-${dependency.gke.outputs.name}"
+  name                = "${dependency.gke.outputs.name}"
   namespace           = "default"
   use_existing_k8s_sa = false
 

@@ -29,7 +29,7 @@ locals {
 
   #Subnets for GKE
   subnet_01    = "${local.environment_name}-${local.region}-subnet-01"
-  cluster_type = "gke-regional"
+  cluster_type = "gke"
 
 }
 
@@ -54,7 +54,7 @@ terraform {
 
 inputs = {
 
-  name              = "${local.cluster_type}-cluster-${local.environment_name}-01"
+  name              = "${local.cluster_type}-${local.environment_name}-01"
   regional          = true
   zones             = local.availability_zones
   network           = dependency.vpc.outputs.network_name
