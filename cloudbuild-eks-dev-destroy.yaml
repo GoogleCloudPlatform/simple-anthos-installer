@@ -4,7 +4,7 @@
 # In this directory, run the following command to build this builder.
 # $ gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
 steps:
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.2-awscli'
     args: ['destroy-all','--terragrunt-non-interactive']
     env:
       - "TF_IN_AUTOMATION=1"
@@ -12,6 +12,5 @@ steps:
       - "TF_VAR_project_id=${PROJECT_ID}"
       - "PROJECT_ID=${PROJECT_ID}"
       - "ENVIRONMENT_NAME=dev"
-      - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
-    dir: gke-gcp/us-central1/dev
+    dir: eks-aws/us-east-1/dev
 tags: ['cloud-builders-community']

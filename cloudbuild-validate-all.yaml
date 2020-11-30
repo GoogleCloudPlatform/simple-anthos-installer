@@ -14,6 +14,7 @@ steps:
     dir: gke-gcp
   - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.2-awscli'
     args: ['validate-all']
+    waitFor: ['-']
     env:
       - "TF_IN_AUTOMATION=1"
       - "TF_INPUT=false"
