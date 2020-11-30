@@ -3,7 +3,7 @@
 # $ gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
 steps:
   - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
-    args: ['apply-all','--terragrunt-non-interactive']
+    args: ['apply','--terragrunt-non-interactive']
     env:
       - "TF_IN_AUTOMATION=1"
       - "TF_INPUT=false"
@@ -13,7 +13,7 @@ steps:
       - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
     dir: gke-gcp/us-central1/dev/1_vpc
   - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
-    args: ['apply-all','--terragrunt-non-interactive']
+    args: ['apply','--terragrunt-non-interactive']
     env:
       - "TF_IN_AUTOMATION=1"
       - "TF_INPUT=false"
@@ -23,7 +23,7 @@ steps:
       - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
     dir: gke-gcp/us-central1/dev/2_gke
   - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
-    args: ['apply-all','--terragrunt-non-interactive']
+    args: ['apply','--terragrunt-non-interactive']
     env:
       - "TF_IN_AUTOMATION=1"
       - "TF_INPUT=false"
@@ -33,7 +33,7 @@ steps:
       - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
     dir: gke-gcp/us-central1/dev/3_workload_identity
   - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
-    args: ['apply-all','--terragrunt-non-interactive']
+    args: ['apply','--terragrunt-non-interactive']
     env:
       - "TF_IN_AUTOMATION=1"
       - "TF_INPUT=false"
@@ -43,7 +43,7 @@ steps:
       - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
     dir: gke-gcp/us-central1/dev/4_hub
   - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
-    args: ['apply-all','--terragrunt-non-interactive']
+    args: ['apply','--terragrunt-non-interactive']
     env:
       - "TF_IN_AUTOMATION=1"
       - "TF_INPUT=false"
