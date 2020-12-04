@@ -24,7 +24,9 @@ steps:
       - "TF_VAR_project_id=${PROJECT_ID}"
       - "TERRAGRUNT_DISABLE_INIT=true"
       - "PROJECT_ID=${PROJECT_ID}" 
-      - "ENVIRONMENT_NAME=validate" 
+      - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}" 
+      - "GCP_REGION=${_GCP_REGION_NAME}"
+      - "AWS_REGION=${_AWS_REGION_NAME}"
     dir: gke-gcp
   - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
     args: ['validate-all']
@@ -35,6 +37,12 @@ steps:
       - "TF_VAR_project_id=${PROJECT_ID}"
       - "TERRAGRUNT_DISABLE_INIT=true"
       - "PROJECT_ID=${PROJECT_ID}" 
-      - "ENVIRONMENT_NAME=validate" 
+      - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}" 
+      - "GCP_REGION=${_GCP_REGION_NAME}"
+      - "AWS_REGION=${_AWS_REGION_NAME}"
     dir: eks-aws
+substitutions:
+  _ENVIRONMENT_NAME: dev
+  _GCP_REGION_NAME: us-central1
+  _AWS_REGION_NAME: us-east-1
 tags: ['cloud-builders-community']
