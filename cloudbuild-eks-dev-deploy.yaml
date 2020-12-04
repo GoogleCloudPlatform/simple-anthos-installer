@@ -24,7 +24,7 @@ steps:
     entrypoint: 'bash'
     args: [ '-c', "gcloud secrets versions access latest --secret=aws-secret-access-key --format='get(payload.data)' | tr '_-' '/+' | base64 -d > aws-secret-access-key.txt" ]
   
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.2-awscli'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
     id: 'eks_vpc'
     entrypoint: 'bash'
     args: ['-c','AWS_ACCESS_KEY_ID=$(cat aws-access-key.txt) AWS_SECRET_KEY=$(cat aws-secret-access-key.txt) && /builder/entrypoint.bash apply --terragrunt-non-interactive']
@@ -35,7 +35,7 @@ steps:
       - "PROJECT_ID=${PROJECT_ID}"
       - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}" 
     dir: eks-aws/${_AWS_REGION_NAME}/${_ENVIRONMENT_NAME}/1_vpc
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.2-awscli'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
     id: 'eks_cluster'
     entrypoint: 'bash'
     args: ['-c','AWS_ACCESS_KEY_ID=$(cat aws-access-key.txt) AWS_SECRET_KEY=$(cat aws-secret-access-key.txt) && /builder/entrypoint.bash apply --terragrunt-non-interactive']
@@ -46,7 +46,7 @@ steps:
       - "PROJECT_ID=${PROJECT_ID}"
       - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}" 
     dir: eks-aws/${_AWS_REGION_NAME}/${_ENVIRONMENT_NAME}/2_eks
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.2-awscli'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
     id: 'eks_hub'
     entrypoint: 'bash'
     args: ['-c','AWS_ACCESS_KEY_ID=$(cat aws-access-key.txt) AWS_SECRET_KEY=$(cat aws-secret-access-key.txt) && /builder/entrypoint.bash apply --terragrunt-non-interactive']
@@ -57,7 +57,7 @@ steps:
       - "PROJECT_ID=${PROJECT_ID}" 
       - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}" 
     dir: eks-aws/${_AWS_REGION_NAME}/${_ENVIRONMENT_NAME}/3_hub
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.2-awscli'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
     id: 'eks_acm'
     entrypoint: 'bash'
     args: ['-c','AWS_ACCESS_KEY_ID=$(cat aws-access-key.txt) AWS_SECRET_KEY=$(cat aws-secret-access-key.txt) && /builder/entrypoint.bash apply --terragrunt-non-interactive']

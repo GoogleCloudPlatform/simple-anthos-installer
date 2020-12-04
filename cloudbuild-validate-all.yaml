@@ -16,7 +16,7 @@
 #In this directory, run the following command to build this builder.
 # $ gcloud builds submit . --config=cloudbuild.yaml
 steps:
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
     args: ['validate-all']
     env:
       - "TF_IN_AUTOMATION=1"
@@ -26,7 +26,7 @@ steps:
       - "PROJECT_ID=${PROJECT_ID}" 
       - "ENVIRONMENT_NAME=validate" 
     dir: gke-gcp
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.2-awscli'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
     args: ['validate-all']
     waitFor: ['-']
     env:

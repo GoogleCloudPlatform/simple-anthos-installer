@@ -16,7 +16,7 @@
 #In this directory, run the following command to build this builder.
 # $ gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
 steps:
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
   - id: 'gke-vpc'
     args: ['apply','--terragrunt-non-interactive']
     env:
@@ -27,7 +27,7 @@ steps:
       - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}"
       - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
     dir: gke-gcp/${_GCP_REGION_NAME}/${_ENVIRONMENT_NAME}/1_vpc
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
   - id: 'gke-cluster'
     args: ['apply','--terragrunt-non-interactive']
     env:
@@ -38,7 +38,7 @@ steps:
       - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}"
       - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
     dir: gke-gcp/${_GCP_REGION_NAME}/${_ENVIRONMENT_NAME}/2_gke
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
   - id: 'gke-worlload-identity'
     args: ['apply','--terragrunt-non-interactive']
     env:
@@ -49,7 +49,7 @@ steps:
       - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}"
       - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
     dir: gke-gcp/${_GCP_REGION_NAME}/${_ENVIRONMENT_NAME}/3_workload_identity
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
   - id: 'gke-hub'
     args: ['apply','--terragrunt-non-interactive']
     env:
@@ -60,7 +60,7 @@ steps:
       - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}"
       - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
     dir: gke-gcp/${_GCP_REGION_NAME}/${_ENVIRONMENT_NAME}/4_hub
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.4'
+  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
   - id: 'gke-acm'
     args: ['apply','--terragrunt-non-interactive']
     env:
