@@ -1,0 +1,19 @@
+# In this directory, run the following command to build this builder.
+# $ gcloud builds submit . --config=cloudbuild.yaml
+substitutions:
+  _LEFTOVERS_VERSION: 0.62.0
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg'
+  - '_LEFTOVERS_VERSION=${_LEFTOVERS_VERSION}'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/leftovers:latest'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/leftovers:${_LEFTOVERS_VERSION}'
+  - '.'
+images:
+- 'gcr.io/$PROJECT_ID/leftovers:latest'
+- 'gcr.io/$PROJECT_ID/leftovers:${_LEFTOVERS_VERSION}'
+tags: ['cloud-builders-community']

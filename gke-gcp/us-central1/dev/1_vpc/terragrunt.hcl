@@ -26,9 +26,7 @@ locals {
 
   environment_name = local.environment_vars.locals.environment_name
 
-  region             = local.region_vars.locals.region
-  availability_zones = local.region_vars.locals.availability_zones
-
+  region = local.region_vars.locals.region
 
   #Subnets for GKE
   subnet_01 = "${local.environment_name}-${local.region}-subnet-01"
