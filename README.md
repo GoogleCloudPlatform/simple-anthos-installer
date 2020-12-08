@@ -1,7 +1,7 @@
 ![Logo](images/logo.png)
 # A Simple Anthos Installer
 
-Automated install of Anthos multi cloud using [Google Cloud best practices](https://cloud.google.com/foundation-toolkit):
+Automated minimal install of Anthos multi cloud using [Google Cloud best practices](https://cloud.google.com/foundation-toolkit):
 
 <img align="right" src="./docs/assets/release-it.gif?raw=true" height="280">
 
@@ -48,30 +48,34 @@ The quickest way to deploy us using Google Cloud Build.
 ### Permissions
 - Ensure Cloud Build service account permission has Kubernetes Engine, Service Account and Secrets Manager enabled.
 
-### Clone the repo
+### 1. Clone the repo
 
 ```bash
 git clone ssh://<user>@google.com@source.developers.google.com:2022/p/east-mfg-ce/r/anthos-edgeML-demo-live
+cd anthos-edgeML-demo-live
 ```
 
-### Build the Cloud Build Container images
-This will build the container images with Terragrunt so cloud build and deploy
+### 2. Build the Cloud Build Container images
+This will build the container images used for our Cloud Build deploy scripts
 
 ```bash
- cd cloudbuild/terragrunt
+ 
+
+ cd cloudbuild/terragrunt-awscli
  gcloud builds submit --config=cloudbuild.yaml
 
- cd ../terragrunt-awscli
+ cd ../leftovers
  gcloud builds submit --config=cloudbuild.yaml
 ```
 
-### Deploy GKE Cluster with ACM and Connect to Anthos
+### 3. Deploy GKE Cluster with ACM and Connect to Anthos
 
 ```bash
- gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
+cd ../..
+gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
 ```
 
-### Deploy EKS Cluster with ACM and Connect to Anthos 
+### 4. Deploy EKS Cluster with ACM and Connect to Anthos 
 
 ```bash
  gcloud builds submit . --config=cloudbuild-eks-dev-deploy.yaml --timeout=30m
