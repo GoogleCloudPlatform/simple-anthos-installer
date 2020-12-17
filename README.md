@@ -43,7 +43,7 @@ gcloud config set core/project ${PROJECT_ID}
   - Secret key stored with key  `aws-secret-access-key`
 
 ## Quick Start
-The quickest way to deploy us using Google Cloud Build.
+The quickest way to deploy is using Google Cloud Build.
 
 ### Permissions
 - Ensure Cloud Build service account permission has Kubernetes Engine, Service Account and Secrets Manager enabled.
@@ -51,7 +51,7 @@ The quickest way to deploy us using Google Cloud Build.
 ### 1. Clone the repo
 
 ```bash
-git clone ssh://<user>@google.com@source.developers.google.com:2022/p/east-mfg-ce/r/anthos-edgeML-demo-live
+git clone sso://team/cloud-manufacturing-east-ce-team
 cd anthos-edgeML-demo-live
 ```
 
@@ -60,12 +60,9 @@ This will build the container images used for our Cloud Build deploy scripts
 
 ```bash
  
-
  cd cloudbuild/terragrunt-awscli
  gcloud builds submit --config=cloudbuild.yaml
 
- cd ../leftovers
- gcloud builds submit --config=cloudbuild.yaml
 ```
 
 ### 3. Deploy GKE Cluster with ACM and Connect to Anthos
@@ -81,5 +78,12 @@ gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
  gcloud builds submit . --config=cloudbuild-eks-dev-deploy.yaml --timeout=30m
 ```
 
-- In order to get the green check on the EKS cluster in the Anthos Dashbaord, we have to [Login to the Cluster](https://cloud.google.com/anthos/multicluster-management/console/logging-in#login) using a KSA token. This is a manual step. Go to the Cloud Build output for the EKS Hub module and look for the output value for `ksa_token`. Use this token to Login to the console from the Anthos Clusters page. 
+In order to get the green check on the EKS cluster in the Anthos Dashbaord, we have to [Login to the Cluster](https://cloud.google.com/anthos/multicluster-management/console/logging-in#login) using a KSA token. This is a manual step. 
+- Go to the Cloud Build output for the EKS Hub module and look for the output value for `ksa_token`. Use this token to Login to the console from the Anthos Clusters page. 
 
+## Cleanup
+```bash
+ gcloud builds submit . --config=cloudbuild-eks-dev-destroy.yaml --timeout=30m
+
+  gcloud builds submit . --config=cloudbuild-gke-dev-destroy.yaml --timeout=30m
+```
