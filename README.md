@@ -16,17 +16,14 @@ Automated minimal install of Anthos multi cloud using [Google Cloud best practic
   <summary><strong>Table of Contents</strong> (click to expand)</summary>
 
 <!-- toc -->
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Changelog](#changelog)
-- [Resources](#resources)
+- [Pre-requisites](#Pre-requisites)
+- [Usage](#Usage)
+- [Cleanup](#Cleanup)
 
 <!-- tocstop -->
 
 </details>
 </p>
-
-## Usage
 
 ## Pre-requisites
 
@@ -42,7 +39,7 @@ gcloud config set core/project ${PROJECT_ID}
   - Access Key stored with key `aws-access-key`
   - Secret key stored with key  `aws-secret-access-key`
 
-## Quick Start
+## Usage
 The quickest way to deploy is using Google Cloud Build.
 
 ### Permissions
