@@ -34,8 +34,8 @@ export PROJECT_ID="<GCP_PROJECTID>"
 gcloud config set core/project ${PROJECT_ID}  
 ```
 - Permission to create GKE Clusters and Anthos API enabled.
-- SSH public key registered with Cloud Build Project (https://source.cloud.google.com/user/ssh_keys)
-- Cloud Build enabled (if using it to deploy)
+- - Cloud Build enabled and your SSH public key registered with Cloud Build Project (https://source.cloud.google.com/user/ssh_keys)
+
 - AWS Account credentials stored in Secret Manager for EKS deploy.
   - Access Key stored with key `aws-access-key`
   - Secret key stored with key  `aws-secret-access-key`
@@ -49,12 +49,12 @@ The quickest way to deploy is using Google Cloud Build.
 ### 1. Clone the repo
 
 ```bash
-git sso://user/arau/simple-anthos
+git clone sso://user/arau/simple-anthos
 cd simple-anthos
 ```
 
 ### 2. Build the Cloud Build Container images
-This will build the container images used for our Cloud Build deploy scripts
+This will build the container images used for our Cloud Build deploy scripts. They container image contains gcloud, terraform, terragrunt and aws-cli installed.
 
 ```bash
  
@@ -65,20 +65,20 @@ This will build the container images used for our Cloud Build deploy scripts
 
 ### 3. Create the Clusters
 
-#### 3a. Create or clone a git repo you want to use for ACM
+#### Create or clone a git repo you want to use for ACM
 
 By default it uses the reference repo here `git@github.com:GoogleCloudPlatform/csp-config-management.git`
 
 To change this to use your own repo, clone the above [repo](https://github.com/GoogleCloudPlatform/csp-config-management) and modify the `sync_repo` variable in the  files  [gke-gcp/us-central1/dev/5_acm/terragrunt.hcl](gke-gcp/us-central1/dev/5_acm/terragrunt.hcl) and [eks-aws/us-east-1/dev/4_acm/terragrunt.hcl](eks-aws/us-east-1/dev/4_acm/terragrunt.hcl) to point to your repo.
 
-#### 3b. Create GKE Cluster on GCP with ACM and Connect to Anthos
+#### Create GKE Cluster on GCP with ACM and Connect to Anthos
 
 ```bash
 cd ../..
 gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
 ```
 
-#### 3c. Create EKS Cluster on AWS with ACM and Connect to Anthos
+#### Create EKS Cluster on AWS with ACM and Connect to Anthos
 
 ```bash
  gcloud builds submit . --config=cloudbuild-eks-dev-deploy.yaml --timeout=30m
@@ -97,3 +97,5 @@ gcloud builds submit . --config=cloudbuild-eks-dev-destroy.yaml --timeout=30m
 
 gcloud builds submit . --config=cloudbuild-gke-dev-destroy.yaml --timeout=30m
 ```
+
+The abpove cleanup will fail if your project is in the `gcct-team` folder because the GCE-Enforcer adds firewall rules that prevent the VPC from being deleted. Easier way would be to use a dedicated project. 
