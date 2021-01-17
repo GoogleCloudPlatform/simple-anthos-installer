@@ -48,7 +48,7 @@ inputs = {
   location         = dependency.gke.outputs.location
   cluster_endpoint = dependency.gke.outputs.endpoint
 
-  sync_repo   = "git@github.com:abhinavrau/csp-config-management.git"
+  sync_repo   = "git@github.com:GoogleCloudPlatform/csp-config-management.git"
   sync_branch = "1.0.0"
   policy_dir  = "foo-corp"
 
