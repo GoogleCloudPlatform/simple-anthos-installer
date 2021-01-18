@@ -3,12 +3,10 @@
 
 Automated Anthos Multi Cloud installer in 3 easy steps!
 
-<img align="right" src="./docs/assets/release-it.gif?raw=true" height="280">
-
 - Deploys 2 Clusters 
   - A GKE Cluster on GCP in a dedicated VPC
   - A EKS Cluster on AWS in a dedicated VPC
-- [Runs GKE Connect](https://cloud.google.com/anthos/multicluster-management/connect/overview) on both clusters
+- [Runs GKE Connect](https://cloud.google.com/anthos/multicluster-management/connect/overview) on both clusters and creates Kubernetes Service Account to use to login to the Anthos console for the EKS Cluster.
 - Enables [Anthos Config Management (ACM)](https://cloud.google.com/anthos/config-management) on both clusters 
 - Uses [CFT](https://cloud.google.com/foundation-toolkit) Terraform modules that follow best practices.
 
@@ -46,14 +44,15 @@ The quickest way to deploy is using Google Cloud Build.
 ### Permissions
 - Ensure Cloud Build service account permission has Kubernetes Engine, Service Account and Secrets Manager enabled.
 
-### 1. Clone the repo
+
+### 0. Clone the repo
 
 ```bash
 git clone sso://user/arau/simple-anthos
 cd simple-anthos
 ```
 
-### 2. Build the Cloud Build Container images
+### 1. Build the Cloud Build Container images
 This will build the container images used for our Cloud Build deploy scripts. They container image contains gcloud, terraform, terragrunt and aws-cli installed.
 
 ```bash
@@ -63,22 +62,22 @@ This will build the container images used for our Cloud Build deploy scripts. Th
 
 ```
 
-### 3. Create the Clusters
+### 2. Create or clone a git repo you want to use for ACM
 
-#### Create or clone a git repo you want to use for ACM
-
-By default it uses the reference repo here `git@github.com:GoogleCloudPlatform/csp-config-management.git`
+By default it uses the reference repo here [git@github.com:GoogleCloudPlatform/csp-config-management.git](https://github.com/GoogleCloudPlatform/csp-config-management)
 
 To change this to use your own repo, clone the above [repo](https://github.com/GoogleCloudPlatform/csp-config-management) and modify the `sync_repo` variable in the  files  [gke-gcp/us-central1/dev/5_acm/terragrunt.hcl](gke-gcp/us-central1/dev/5_acm/terragrunt.hcl) and [eks-aws/us-east-1/dev/4_acm/terragrunt.hcl](eks-aws/us-east-1/dev/4_acm/terragrunt.hcl) to point to your repo.
 
-#### Create GKE Cluster on GCP with ACM and Connect to Anthos
+### 3. Create the Clusters
+
+#### Create GKE Cluster on GCP
 
 ```bash
 cd ../..
 gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
 ```
 
-#### Create EKS Cluster on AWS with ACM and Connect to Anthos
+#### Create EKS Cluster on AWS 
 
 ```bash
  gcloud builds submit . --config=cloudbuild-eks-dev-deploy.yaml --timeout=30m
