@@ -43,7 +43,7 @@ generate "provider" {
     }
 
     terraform {
-      required_version = ">= 0.12"
+      required_version = ">= 0.13"
     }
 
     provider "random" {
@@ -62,13 +62,14 @@ generate "provider" {
       version = "~> 2.1"
     }
 
+
 EOF
 }
 
 # Configure terraform state to be stored in GCS,
 remote_state {
-  # disable_init = tobool(get_env("TERRAGRUNT_DISABLE_INIT", "false"))
-  backend = "gcs"
+  disable_init = tobool(get_env("TERRAGRUNT_DISABLE_INIT", "false"))
+  backend      = "gcs"
   config = {
     project  = local.project_id
     location = local.region

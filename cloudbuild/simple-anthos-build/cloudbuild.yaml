@@ -2,10 +2,10 @@
 # $ gcloud builds submit . --config=cloudbuild.yaml
 
 substitutions:
-  _TERRAFORM_VERSION: 0.12.29
-  _TERRAFORM_VERSION_SHA256SUM: 872245d9c6302b24dc0d98a1e010aef1e4ef60865a2d1f60102c8ad03e9d5a1d
-  _TERRAGRUNT_VERSION: 0.26.7
-  _TERRAGRUNT_VERSION_SHA256SUM: ac9df2de05d8fd14e3f8deb91899814461ac89f9cecb6a1fb44c8e74e1c6bf06
+  _TERRAFORM_VERSION: 0.13.6
+  _TERRAFORM_VERSION_SHA256SUM: 55f2db00b05675026be9c898bdd3e8230ff0c5c78dd12d743ca38032092abfc9
+  _TERRAGRUNT_VERSION: 0.28.2
+  _TERRAGRUNT_VERSION_SHA256SUM: 86707bac30900bfac61e390d9c5c90febcc6db956aa320a72c902d989ee7fe8d
 
 steps:
   - name: "gcr.io/cloud-builders/docker"
@@ -25,11 +25,11 @@ steps:
       - --build-arg
       - TERRAGRUNT_VERSION_SHA256SUM=${_TERRAGRUNT_VERSION_SHA256SUM}
       - --tag
-      - "gcr.io/${PROJECT_ID}/terragrunt:${_TERRAFORM_VERSION}-${_TERRAGRUNT_VERSION}-awscli"
+      - "gcr.io/${PROJECT_ID}/simple-anthos-build:${_TERRAFORM_VERSION}-${_TERRAGRUNT_VERSION}-awscli"
       - --tag
-      - "gcr.io/${PROJECT_ID}/terragrunt:latest"
+      - "gcr.io/${PROJECT_ID}/simple-anthos-build:latest"
       - "."
 images:
-  - "gcr.io/${PROJECT_ID}/terragrunt:${_TERRAFORM_VERSION}-${_TERRAGRUNT_VERSION}-awscli"
-  - "gcr.io/${PROJECT_ID}/terragrunt:latest"
+  - "gcr.io/${PROJECT_ID}/simple-anthos-build:${_TERRAFORM_VERSION}-${_TERRAGRUNT_VERSION}-awscli"
+  - "gcr.io/${PROJECT_ID}/simple-anthos-build:latest"
 tags: ["cloud-builders-community"]

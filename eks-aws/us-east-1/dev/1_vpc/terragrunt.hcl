@@ -42,7 +42,9 @@ terraform {
 
 inputs = {
 
-  aws_region = local.aws_region
   #Include the GCP project name in naming the resources so we know which GCP project created it
   environment_name = "${local.environment_name}-gcp:${local.project_id}"
+  additional_tags = { env = "${local.environment_name}"
+    createdByProject = "${local.project_id}"
+  }
 }

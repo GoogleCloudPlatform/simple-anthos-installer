@@ -8,7 +8,7 @@ This builder can be used to run the terragrunt tool in Google Cloud Build with t
 ### Building this builder
 To build this builder, run the following command in this directory.
 ```sh
-$ gcloud builds submit --config=cloudbuild.yaml
+gcloud builds submit --config=cloudbuild.yaml
 ```
 
 ## Using this builder

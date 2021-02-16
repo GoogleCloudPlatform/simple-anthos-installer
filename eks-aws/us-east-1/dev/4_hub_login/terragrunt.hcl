@@ -1,4 +1,3 @@
-
 # Include all settings from the root terragrunt.hcl file
 include {
   path = find_in_parent_folders()
@@ -28,8 +27,6 @@ locals {
   environment_name = local.environment_vars.locals.environment_name
 
   aws_region = local.region_vars.locals.aws_region
-  region     = local.region_vars.locals.region
-
   #Get the GCP project ID
   project_id = local.account_vars.locals.project_id
 
@@ -40,48 +37,45 @@ dependency "eks" {
 
   config_path = "../2_eks"
 
-  # Configure mock outputs for the `validate` command that are returned when there are no outputs available (e.g the
-  # module hasn't been applied yet.
-  mock_outputs_allowed_terraform_commands = ["validate"]
-  mock_outputs = {
-
-    cluster_name            = ["fake"]
-    cluster_endpoint        = ["fake"]
-    region                  = ["fake"]
-    cluster_endpoint        = ["fake"]
-    kubeconfig              = ["fake"]
-    gke_hub_membership_name = ["fake"]
-  }
 }
 
 dependencies {
+
   paths = ["../3_hub"]
+}
+
+#Generate the K8s provider since it is specific to EKS. More info here: https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs
+generate "k8s_provider" {
+  path      = "k8s_provider.tf"
+  if_exists = "overwrite"
+  contents  = <<EOF
+
+  provider "kubernetes" {
+  host                   = "${dependency.eks.outputs.cluster_endpoint}"
+  cluster_ca_certificate = base64decode("${dependency.eks.outputs.cluster_ca_cert}")
+  exec {
+    api_version = "client.authentication.k8s.io/v1alpha1"
+    args        = ["eks", "get-token", "--cluster-name", "${dependency.eks.outputs.cluster_name}"]
+    command     = "aws"
+  }
+}
+EOF
 }
 
 terraform {
 
-  source = "github.com/abhinavrau/terraform-google-kubernetes-engine.git//modules/acm?ref=acm_k8s"
-
+  source = "../../../terraform/hub_login"
 
   # Before apply and plan to set the current kubetctl context to the eks cluster
   before_hook "before_hook_1" {
     commands = ["apply", "plan"]
     execute  = ["aws", "eks", "--region", "${local.aws_region}", "update-kubeconfig", "--name", "${local.cluster_name}"]
   }
-}
 
+}
 
 inputs = {
 
-  project_id = local.project_id
-  location   = local.region
-
-  cluster_name         = dependency.eks.outputs.cluster_name
-  cluster_endpoint     = dependency.eks.outputs.cluster_endpoint
-  use_existing_context = true
-
-  sync_repo   = "git@github.com:abhinavrau/csp-config-management.git"
-  sync_branch = "1.0.0"
-  policy_dir  = "foo-corp"
 
 }
+

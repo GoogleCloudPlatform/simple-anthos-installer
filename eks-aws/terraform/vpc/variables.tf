@@ -1,5 +1,5 @@
 /**
- * Copyright 2018 Google LLC
+ * Copyright 2020 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
  */
 
 
-output "wait" {
-  description = "An output to use when you want to depend on registration finishing"
-  value       = module.gke_hub_registration.wait
+variable "environment_name" {
+  description = "Environment Name used to name resources"
 }
 
-output "ksa_token" {
-  description = "This the service account token to use to register this cluster in the Anthos console"
-  value       = "${lookup(data.kubernetes_secret.ksa_secret.data, "token", "")}"
+variable "additional_tags" {
+  default     = {}
+  description = "Additional resource tags"
+  type        = map(string)
 }
-
 
 

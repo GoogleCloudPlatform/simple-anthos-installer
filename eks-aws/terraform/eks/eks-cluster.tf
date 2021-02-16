@@ -24,11 +24,12 @@ module "eks" {
   cluster_version = "1.17"
   subnets         = var.private_subnets
 
-  tags = {
-    Environment = var.cluster_name
-    GithubRepo  = "terraform-aws-eks"
-    GithubOrg   = "terraform-aws-modules"
-  }
+  tags = merge(
+    var.additional_tags,
+    {
+      created_by = "simple-anthos"
+    },
+  )
 
   vpc_id = var.vpc_id
 

@@ -35,7 +35,7 @@ dependencies {
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/acm?ref=v12.1.0"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/acm?ref=v13.0.0"
 
 
 }

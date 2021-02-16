@@ -79,9 +79,9 @@ steps:
 # Get AWS secret from Secrets Manager
 availableSecrets:
   secretManager:
-  - versionName: projects/REPLACE_WITH_PROJECT_ID/secrets/aws_access_key_id/versions/latest
+  - versionName: projects/arau-anthos-seed/secrets/aws_access_key_id/versions/latest
     env: 'AWS_ACCESS_KEY_ID'
-  - versionName: projects/REPLACE_WITH_PROJECT_ID/secrets/aws_secret_access_key/versions/latest
+  - versionName: projects/arau-anthos-seed/secrets/aws_secret_access_key/versions/latest
     env: 'AWS_SECRET_ACCESS_KEY'
 substitutions:
   _ENVIRONMENT_NAME: dev

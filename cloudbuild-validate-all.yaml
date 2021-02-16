@@ -16,7 +16,7 @@
 #In this directory, run the following command to build this builder.
 # $ gcloud builds submit . --config=cloudbuild.yaml
 steps:
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
+  - name: 'gcr.io/${PROJECT_ID}/simple-anthos-build:latest'
     args: ['validate-all']
     env:
       - "TF_IN_AUTOMATION=1"
@@ -28,7 +28,7 @@ steps:
       - "GCP_REGION=${_GCP_REGION_NAME}"
       - "AWS_REGION=${_AWS_REGION_NAME}"
     dir: gke-gcp
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
+  - name: 'gcr.io/${PROJECT_ID}/simple-anthos-build:latest'
     args: ['validate-all']
     waitFor: ['-']
     env:

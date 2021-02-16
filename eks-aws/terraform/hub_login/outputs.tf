@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Google LLC
+ * Copyright 2018 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,12 @@
  * limitations under the License.
  */
 
-variable "aws_region" {
-  description = "AWS region"
+
+
+output "ksa_token" {
+  description = "This the service account token to use to register this cluster in the Anthos console"
+  value       = "${lookup(data.kubernetes_secret.ksa_secret.data, "token", "")}"
 }
 
-variable "cluster_name" {
-  description = "EKS Cluster Name"
-}
-
-variable "vpc_id" {
-  description = "VPC ID"
-}
-
-variable "private_subnets" {
-  description = "Private subnet array"
-  type        = list(string)
-}
-
-variable "additional_tags" {
-  default     = {}
-  description = "Additional resource tags"
-  type        = map(string)
-}
 
 

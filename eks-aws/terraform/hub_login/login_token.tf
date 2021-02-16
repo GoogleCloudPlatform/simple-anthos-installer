@@ -23,9 +23,6 @@
 
 # This loads the current context. It is assumed that the current context is set to the cluster we want 
 # to log into.
-provider "kubernetes" {
-  
-}
 
 # Create Kubernetes Service Account (KSA)
 resource "kubernetes_service_account" "remote-admin-sa" {
@@ -52,7 +49,7 @@ resource "kubernetes_cluster_role_binding" "ksa-admin-binding" {
     namespace = "default"
   }
 
-  depends_on = [ module.gke_hub_registration ]
+  depends_on = [var.module_depends_on]
 }
 
 data "kubernetes_secret" "ksa_secret" {

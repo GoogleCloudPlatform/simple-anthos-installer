@@ -14,15 +14,6 @@
  * limitations under the License.
  */
 
-variable "aws_region" {
-  description = "AWS region"
-}
-
-variable "environment_name" {
-  description = "Environment Name used to name resources"
-}
-
-
 data "aws_availability_zones" "available" {}
 
 
@@ -39,17 +30,27 @@ module "vpc" {
   single_nat_gateway   = true
   enable_dns_hostnames = true
 
-  tags = {
-    "kubernetes.io/cluster/${var.environment_name}" = "shared"
-  }
+  tags = merge(
+    var.additional_tags,
+    {
+      created_by = "simple-anthos"
+      env        = var.environment_name
+    },
+  )
 
-  public_subnet_tags = {
-    "kubernetes.io/cluster/${var.environment_name}" = "shared"
-    "kubernetes.io/role/elb"                        = "1"
-  }
+  public_subnet_tags = merge(
+    var.additional_tags,
+    {
+      created_by = "simple-anthos"
+      env        = var.environment_name
+    },
+  )
 
-  private_subnet_tags = {
-    "kubernetes.io/cluster/${var.environment_name}" = "shared"
-    "kubernetes.io/role/internal-elb"               = "1"
-  }
+  private_subnet_tags = merge(
+    var.additional_tags,
+    {
+      created_by = "simple-anthos"
+      env        = var.environment_name
+    },
+  )
 }

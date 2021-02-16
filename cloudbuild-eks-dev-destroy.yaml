@@ -18,8 +18,8 @@
 # In this directory, run the following command to build this builder.
 # $ gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
 steps:
-  - name: 'gcr.io/${PROJECT_ID}/terragrunt:0.12.29-0.26.7-awscli'
-    args: ['destroy-all','--terragrunt-non-interactive']
+  - name: 'gcr.io/${PROJECT_ID}/simple-anthos-build:latest'
+    args: ['run-all','destroy','--terragrunt-non-interactive']
     env:
       - "TF_IN_AUTOMATION=1"
       - "TF_INPUT=false"

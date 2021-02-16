@@ -34,7 +34,7 @@ locals {
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-network.git?ref=v2.5.0"
+  source = "github.com/terraform-google-modules/terraform-google-network.git?ref=v3.0.1"
 }
 
 inputs = {

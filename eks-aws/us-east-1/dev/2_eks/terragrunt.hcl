@@ -60,4 +60,7 @@ inputs = {
   cluster_name    = "remote-${local.environment_name}-${local.project_id}-1"
   vpc_id          = dependency.vpc.outputs.vpc_id
   private_subnets = dependency.vpc.outputs.private_subnets
+  additional_tags = { env = "${local.environment_name}"
+    createdByProject = "${local.project_id}"
+  }
 }

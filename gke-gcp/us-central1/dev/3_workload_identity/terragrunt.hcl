@@ -1,8 +1,8 @@
-
 # Include all settings from the root terragrunt.hcl file
 include {
   path = find_in_parent_folders()
 }
+
 
 generate "backend" {
   path      = "backend.tf"
@@ -12,6 +12,21 @@ generate "backend" {
       backend "gcs" {}
     }
   EOF
+}
+
+generate "k8s_provider" {
+  path      = "k8s_provider.tf"
+  if_exists = "overwrite"
+  contents  = <<EOF
+
+  data "google_client_config" "default" {}
+
+  provider "kubernetes" {
+    host                   = "https://${dependency.gke.outputs.endpoint}"
+    token                  = data.google_client_config.default.access_token
+    cluster_ca_certificate = base64decode("${dependency.gke.outputs.ca_certificate}")
+  }
+EOF
 }
 
 dependency "gke" {
@@ -28,12 +43,12 @@ dependency "gke" {
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/workload-identity?ref=v12.1.0"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/workload-identity?ref=v13.0.0"
 }
 
 inputs = {
 
-  name                = "${dependency.gke.outputs.name}"
+  name                = "iden-${dependency.gke.outputs.name}"
   namespace           = "default"
   use_existing_k8s_sa = false
 
