@@ -1,4 +1,5 @@
-![Logo](images/logo.png)
+<img src="images/logo.png" alt="drawing" width="200"/>
+
 # A Simple Anthos Installer
 
 An Automated and Configurable Anthos Multi Cloud installer framework. Great for quickly setting up a Demo or POC.
