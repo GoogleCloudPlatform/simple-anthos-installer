@@ -1,4 +1,4 @@
-<img src="images/logo.png" alt="drawing" width="200"/>
+![Logo](images/logo.png =400)
 
 # A Simple Anthos Installer
 
