@@ -11,20 +11,48 @@ An Automated and Configurable Anthos Multi Cloud installer framework. Great for 
   
 
 # What can it Install?
+ 
+- A GKE Cluster on GCP in a dedicated VPC with [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity), [GKE Connect](https://cloud.google.com/anthos/multicluster-management/connect/overview) and [Anthos Config Management (ACM)](https://cloud.google.com/anthos/config-management) enabled.
 
-## GKE on GCP 
-- A GKE Cluster on GCP in a dedicated VPC 
-- Runs [GKE Connect](https://cloud.google.com/anthos/multicluster-management/connect/overview) on the created cluster
-- Enables [Anthos Config Management (ACM)](https://cloud.google.com/anthos/config-management)
+- An EKS Cluster on AWS in a dedicated VPC with [GKE Connect](https://cloud.google.com/anthos/multicluster-management/connect/overview) and [Anthos Config Management (ACM)](https://cloud.google.com/anthos/config-management) enabled. Also creates a Kubernetes Service Account to use to login to the GCP console.
 
-## EKS on AWS
-- An EKS Cluster on AWS in a dedicated VPC 
+# QuickStart 
+Check the [pre-requisites](#pre-requisites)  
 
-- Runs [GKE Connect](https://cloud.google.com/anthos/multicluster-management/connect/overview) on the created cluster.
-- Creates a Kubernetes Service Account to use to login to the Anthos console for the EKS Cluster.
-- Enables [Anthos Config Management (ACM)](https://cloud.google.com/anthos/config-management) 
+```bash
+# Clone the repo
+git clone sso://user/arau/simple-anthos
+cd simple-anthos
 
+# Setup Project Env variables
+export PROJECT_ID="<GCP_PROJECTID>"
+gcloud config set core/project ${PROJECT_ID}  
 
+# Build the Cloud Build container image which will store the image in your project GCR 
+cd cloudbuild/simple-anthos-build
+ gcloud builds submit --config=cloudbuild.yaml
+
+###### GKE Cluster ######
+# Create the GKE Cluster with Workload Identity, GKE Connect(Hub) and ACM enabled.
+cd ../..
+gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
+
+#####  EKS Cluster ######
+# Setup AWS credentials in Secrets Manager
+printf $AWS_ACCESS_KEY_ID | gcloud secrets create aws-access-key --data-file=-
+printf $AWS_SECRET_ACCESS_KEY | gcloud secrets create aws-secret-access-key --data-file=-
+
+# Replace the REPLACE_WITH_PROJECT_ID string with your GCP project since Cloud Build does not yet support parameterizing secret paths
+sed -i 's@REPLACE_WITH_PROJECT_ID@'"$PROJECT_ID"'@' cloudbuild-eks-dev-deploy.yaml
+
+# Create the EKS Cluster connected with GKE Connect(Hub) and ACM enabled.
+gcloud builds submit . --config=cloudbuild-eks-dev-deploy.yaml --timeout=30m
+
+```
+This will create 2 clusters named `gke-dev-01` and `remote-dev-$PROJECT_ID` in GKE and EKS respectively.
+
+<br/>
+<br/>
 
 # Table of Contents
 
@@ -32,22 +60,19 @@ An Automated and Configurable Anthos Multi Cloud installer framework. Great for 
 - [A Simple Anthos Installer](#a-simple-anthos-installer)
   - [Goals](#goals)
 - [What can it Install?](#what-can-it-install)
-  - [GKE on GCP](#gke-on-gcp)
-  - [EKS on AWS](#eks-on-aws)
+- [QuickStart](#quickstart)
 - [Table of Contents](#table-of-contents)
   - [Pre-requisites](#pre-requisites)
     - [Local Machine](#local-machine)
     - [GCP Requirements](#gcp-requirements)
-    - [Build the Cloud Build Container images](#build-the-cloud-build-container-images)
-    - [Create or clone a git repo you want to use for ACM](#create-or-clone-a-git-repo-you-want-to-use-for-acm)
-- [Usage](#usage)
-  - [1. Clone the repo](#1-clone-the-repo)
-  - [2. Create GKE Cluster on GCP](#2-create-gke-cluster-on-gcp)
+    - [Cloud Build Container image](#cloud-build-container-image)
+    - [Clone (or create) a git repo you want to use for ACM](#clone-or-create-a-git-repo-you-want-to-use-for-acm)
+- [Detailed Usage](#detailed-usage)
+  - [1. Create GKE Cluster on GCP](#1-create-gke-cluster-on-gcp)
     - [ACM](#acm)
-  - [3. Create EKS Cluster on AWS](#3-create-eks-cluster-on-aws)
+  - [2. Create EKS Cluster on AWS](#2-create-eks-cluster-on-aws)
     - [AWS Credentials](#aws-credentials)
     - [Update project path in cloudbuild-eks-dev-deploy.yaml](#update-project-path-in-cloudbuild-eks-dev-deployyaml)
-    - [Deploy](#deploy)
     - [Login to the Cluster in GCP Console](#login-to-the-cluster-in-gcp-console)
     - [ACM](#acm-1)
   - [Enjoy!](#enjoy)
@@ -62,6 +87,8 @@ An Automated and Configurable Anthos Multi Cloud installer framework. Great for 
   - [Deploying the infrastructure](#deploying-the-infrastructure)
 
 <!-- tocstop -->
+<br/>
+<br/>
 
 ## Pre-requisites
 ### Local Machine 
@@ -82,11 +109,10 @@ gcloud config set core/project ${PROJECT_ID}
   
 - Ensure the following roles for the Cloud Build Service account:
 
-![cloudbuild-service-account](images/cloudbuild-service-account.png)
+<img src="images/cloudbuild-service-account.png" alt="drawing" width="600"/>
 
-
-### Build the Cloud Build Container images
-We need to build the container image used for our Cloud Build deploy to use. This is one time step which will store the container image in GCR in your project and will be used to create our infrastreucture. The container image has gcloud, terraform, terragrunt and aws-cli installed. 
+### Cloud Build Container image
+We need to build the container image used for our Cloud Build deploy to use. This is one time step which will store the container image in GCR in your project and will be used to create our infrastructure. The container image has gcloud, terraform, terragrunt and aws-cli installed. 
 
 ```bash
  
@@ -95,40 +121,33 @@ We need to build the container image used for our Cloud Build deploy to use. Thi
 
 ```
 
-### Create or clone a git repo you want to use for ACM
+### Clone (or create) a git repo you want to use for ACM
 
 By default it uses the reference repo [git@github.com:GoogleCloudPlatform/csp-config-management.git](https://github.com/GoogleCloudPlatform/csp-config-management)
 
 To change this to use your own repo, clone the above [repo](https://github.com/GoogleCloudPlatform/csp-config-management) and modify the `sync_repo` variable in the  files  [gke-gcp/us-central1/dev/5_acm/terragrunt.hcl](gke-gcp/us-central1/dev/5_acm/terragrunt.hcl#51) and [eks-aws/us-east-1/dev/5_acm/terragrunt.hcl](eks-aws/us-east-1/dev/5_acm/terragrunt.hcl#80) to point to your repo.
-# Usage
+# Detailed Usage
 
-## 1. Clone the repo
-
-```bash
-git clone sso://user/arau/simple-anthos
-cd simple-anthos
-```
-
-## 2. Create GKE Cluster on GCP
+## 1. Create GKE Cluster on GCP
 From the root git folder
 
 ```bash
 gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
 ```
 
-Go get some ☕ and if all goes well, in about 20 minutes, you should see somthing like this on the Anthos console in the Clusters view:
+Go get some ☕ and if all goes well, in about 20 minutes, you should see this on the Anthos console in the Clusters view:
 
-![GKE-Hub](images/gke-connect.png)
+<img src="images/gke-connect.png" alt="drawing" width="500"/>
 
 
 ### ACM 
 In the Anthos Config Management, you should see the following:
 
-![GKE-ACM](images/acm.png)
+<img src="images/acm.png" alt="drawing" width="600"/>
 
-If you see an issue with config status in error you may beed to configure the ACM SSH public key on your git repo . The install script outputs a value `git_creds_public` which is the public key to use with you git provider.
+You will need to configure the ACM SSH public key on your git repo. The install script outputs a value `git_creds_public` which is the public key to use with you git provider.
 
-## 3. Create EKS Cluster on AWS 
+## 2. Create EKS Cluster on AWS 
 
 ### AWS Credentials
 
@@ -137,13 +156,14 @@ In order to create AWS resources the AWS Account credentials are stored in Secre
 Sample script to store the creds.
 
 ```bash
+# Setup AWS credentials in Secrets Manager
 printf $AWS_ACCESS_KEY_ID | gcloud secrets create aws-access-key --data-file=-
 printf $AWS_SECRET_ACCESS_KEY | gcloud secrets create aws-secret-access-key --data-file=-
 ```
 
 ### Update project path in cloudbuild-eks-dev-deploy.yaml
 
-CloudBuild has made it [easier to access secrets](https://cloud.google.com/build/docs/securing-builds/use-secrets#configuring_builds_to_access_the_secret_from) but the GCP `PROJECT_ID` parameter is not configrable and hence needs to be changed in the build yaml.
+CloudBuild has made it [easier to access secrets](https://cloud.google.com/build/docs/securing-builds/use-secrets#configuring_builds_to_access_the_secret_from) but the GCP `PROJECT_ID` parameter is not configurable and hence needs to be changed in the build yaml.
 
 Modify the following section below to reflect the PROJECT_ID where the AWS credentials are stored.
 
@@ -156,9 +176,11 @@ availableSecrets:
     env: 'AWS_SECRET_ACCESS_KEY'
 ```
 
-### Deploy
-
 ```bash
+# Replace the REPLACE_WITH_PROJECT_ID string with your GCP project since Cloud Build does not yet support passing environment variables in secret paths
+sed -i 's@REPLACE_WITH_PROJECT_ID@'"$PROJECT_ID"'@' cloudbuild-eks-dev-deploy.yaml
+
+### Deploy
  gcloud builds submit . --config=cloudbuild-eks-dev-deploy.yaml --timeout=30m
 ```
 
@@ -174,9 +196,10 @@ Follow the steps from [GKE](#acm) above to enable ACM
 
 Now you have a 2 clusters connected to an envrion (your GCP project) with ACM enabled. 
 
-![eks-gke](images/eks-gke.png)
+<img src="images/eks-gke.png" alt="drawing" width="600"/>
 
-![eks-gke-acm](images/acm-gke-eks.png)
+
+<img src="images/acm-gke-eks.png" alt="drawing" width="700"/>
 
 ## Cleanup
 ```bash
@@ -185,7 +208,7 @@ gcloud builds submit . --config=cloudbuild-eks-dev-destroy.yaml --timeout=30m
 gcloud builds submit . --config=cloudbuild-gke-dev-destroy.yaml --timeout=30m
 ```
 
-The above cleanup will fail if your project is in the `gcct-team` folder because the GCE-Enforcer adds firewall rules that prevent the VPC from being deleted. Easier way would be to use a dedicated project and delete the project when you are finished with it.
+The above cleanup will fail if your project adds additional firewall rules that this script did not create which will prevent the VPC from being deleted. Easier way would be to use a dedicated project and delete the project when you are finished with it.
 
 
 # Customization and Extending
