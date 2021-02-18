@@ -17,7 +17,7 @@
 # $ gcloud builds submit . --config=cloudbuild.yaml
 steps:
   - name: 'gcr.io/${PROJECT_ID}/simple-anthos-build:latest'
-    args: ['validate-all']
+    args: ['run-all','validate','--terragrunt-non-interactive']
     env:
       - "TF_IN_AUTOMATION=1"
       - "TF_INPUT=false"
@@ -29,7 +29,7 @@ steps:
       - "AWS_REGION=${_AWS_REGION_NAME}"
     dir: gke-gcp
   - name: 'gcr.io/${PROJECT_ID}/simple-anthos-build:latest'
-    args: ['validate-all']
+    args: ['run-all','validate','--terragrunt-non-interactive']
     waitFor: ['-']
     env:
       - "TF_IN_AUTOMATION=1"

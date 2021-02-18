@@ -38,8 +38,8 @@ generate "provider" {
     }
 
     provider "aws" {
-      version = ">= 2.28.1"
-      region  = "${local.aws_region}"
+        version = ">= 2.28.1"
+        region  = "${local.aws_region}"
     }
 
     terraform {
@@ -61,8 +61,6 @@ generate "provider" {
     provider "template" {
       version = "~> 2.1"
     }
-
-
 EOF
 }
 

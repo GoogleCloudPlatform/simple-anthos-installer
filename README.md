@@ -1,4 +1,4 @@
-![Logo](images/logo.png =400)
+![Logo](images/logo.png)
 
 # A Simple Anthos Installer
 
@@ -13,7 +13,7 @@ An Automated and Configurable Anthos Multi Cloud installer framework. Great for 
 
 # What can it Install?
  
-- A GKE Cluster on GCP in a dedicated VPC with [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity), [GKE Connect](https://cloud.google.com/anthos/multicluster-management/connect/overview) and [Anthos Config Management (ACM)](https://cloud.google.com/anthos/config-management) enabled.
+- A Regional GKE Cluster on GCP in a dedicated VPC with [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity), [GKE Connect](https://cloud.google.com/anthos/multicluster-management/connect/overview), [Anthos Config Management (ACM)](https://cloud.google.com/anthos/config-management) and [Anthos Service Mesh (ACM)](https://cloud.google.com/service-mesh/docs/overview) enabled.
 
 - An EKS Cluster on AWS in a dedicated VPC with [GKE Connect](https://cloud.google.com/anthos/multicluster-management/connect/overview) and [Anthos Config Management (ACM)](https://cloud.google.com/anthos/config-management) enabled. Also creates a Kubernetes Service Account to use to login to the GCP console.
 
@@ -29,6 +29,9 @@ cd simple-anthos
 export PROJECT_ID="<GCP_PROJECTID>"
 gcloud config set core/project ${PROJECT_ID}  
 
+# Specify the ACM repo to use. You can clone this one https://github.com/GoogleCloudPlatform/csp-config-management
+export ACM_REPO="git@github.com:your-git-repo/csp-config-management.git"
+
 # Build the Cloud Build container image which will store the image in your project GCR 
 cd cloudbuild/simple-anthos-build
  gcloud builds submit --config=cloudbuild.yaml
@@ -36,8 +39,7 @@ cd cloudbuild/simple-anthos-build
 ###### GKE Cluster ######
 # Create the GKE Cluster with Workload Identity, GKE Connect(Hub) and ACM enabled.
 cd ../..
-gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
-
+gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m --substitutions=_ASM_REPO=$ACM_REPO
 #####  EKS Cluster ######
 # Setup AWS credentials in Secrets Manager
 printf $AWS_ACCESS_KEY_ID | gcloud secrets create aws-access-key --data-file=-
@@ -47,10 +49,10 @@ printf $AWS_SECRET_ACCESS_KEY | gcloud secrets create aws-secret-access-key --da
 sed -i 's@REPLACE_WITH_PROJECT_ID@'"$PROJECT_ID"'@' cloudbuild-eks-dev-deploy.yaml
 
 # Create the EKS Cluster connected with GKE Connect(Hub) and ACM enabled.
-gcloud builds submit . --config=cloudbuild-eks-dev-deploy.yaml --timeout=30m
+gcloud builds submit . --config=cloudbuild-eks-dev-deploy.yaml --timeout=30m --substitutions=_ASM_REPO=$ACM_REPO
 
 ```
-This will create 2 clusters named `gke-dev-01` and `remote-dev-$PROJECT_ID` in GKE and EKS respectively.
+This will create 2 clusters named `gke-dev-01` and `remote-dev-$PROJECT_ID` in GKE and EKS respectively connected .
 
 <br/>
 <br/>
@@ -83,9 +85,13 @@ This will create 2 clusters named `gke-dev-01` and `remote-dev-$PROJECT_ID` in G
     - [To change the region:](#to-change-the-region)
     - [Modify/Add a New Environment:](#modifyadd-a-new-environment)
   - [AWS Directory Structure](#aws-directory-structure)
-- [Development and Testing (MacOS and Linux)](#development-and-testing-macos-and-linux)
+- [Development and Testing (only tested on Linux)](#development-and-testing-only-tested-on-linux)
   - [Validating the scripts](#validating-the-scripts)
   - [Deploying the infrastructure](#deploying-the-infrastructure)
+- [Known Issues](#known-issues)
+- [Support](#support)
+- [References](#references)
+- [Related Projects](#related-projects)
 
 <!-- tocstop -->
 <br/>
@@ -110,7 +116,9 @@ gcloud config set core/project ${PROJECT_ID}
   
 - Ensure the following roles for the Cloud Build Service account:
 
-<img src="images/cloudbuild-service-account.png" alt="drawing" width="600"/>
+![](images/cloudbuild-service-account.png)
+
+Or go YOLO and give it Owner privilage (not recemmended)
 
 ### Cloud Build Container image
 We need to build the container image used for our Cloud Build deploy to use. This is one time step which will store the container image in GCR in your project and will be used to create our infrastructure. The container image has gcloud, terraform, terragrunt and aws-cli installed. 
@@ -138,15 +146,16 @@ gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
 
 Go get some ☕ and if all goes well, in about 20 minutes, you should see this on the Anthos console in the Clusters view:
 
-<img src="images/gke-connect.png" alt="drawing" width="500"/>
+![](images/gke-connect.png)
 
 
 ### ACM 
-In the Anthos Config Management, you should see the following:
 
-<img src="images/acm.png" alt="drawing" width="600"/>
+You will need to configure the cluster's ACM SSH public key on your git config management repo you created [earlier](#clone-or-create-a-git-repo-you-want-to-use-for-acm). The install script outputs a value `git_creds_public` which is the public key to use with you git provider.
 
-You will need to configure the ACM SSH public key on your git repo. The install script outputs a value `git_creds_public` which is the public key to use with you git provider.
+Once you have updated the SSH public key successfully, in the Anthos Config Management screen, you should see the following:
+![](images/acm.png)
+
 
 ## 2. Create EKS Cluster on AWS 
 
@@ -192,15 +201,18 @@ In order to see the EKS cluster details in the Anthos Dashbaord, you have to [Lo
 Go to the Cloud Build output for the EKS Hub module and look for the output value for `ksa_token`. Use this token to Login to the GCP console from the Kubernetes Clusters page. 
 
 ### ACM 
-Follow the steps from [GKE](#acm) above to enable ACM
+Follow the steps from GKE [above](#acm) to enable ACM
+
+<br/>
+
 ## Enjoy!
 
 Now you have a 2 clusters connected to an envrion (your GCP project) with ACM enabled. 
 
-<img src="images/eks-gke.png" alt="drawing" width="600"/>
+![](images/eks-gke.png)
 
 
-<img src="images/acm-gke-eks.png" alt="drawing" width="700"/>
+![](images/acm-gke-eks.png)
 
 ## Cleanup
 ```bash
@@ -277,7 +289,7 @@ The `aws-eks` directory is structured as similar but has a directory `terraform`
     └── region.hcl
 ```
 
-# Development and Testing (MacOS and Linux)
+# Development and Testing (only tested on Linux)
 
 Make sure you have the following installed:
 - Terraform 0.13.x
@@ -295,7 +307,7 @@ terragrunt validate-all
 
 ## Deploying the infrastructure
 
-You can deploy all the infrastrcture for a specific cloud provider or one module at a time.  
+You can deploy all the infrastructure for a specific cloud provider or one module at a time.  
 
 From a numbered directory or its parent, run:
 
@@ -303,5 +315,17 @@ From a numbered directory or its parent, run:
 terragrunt run-all apply --terragrunt-non-interactive
 ```
 
+# Known Issues
 
+- Clean Upgrade and Uninstall of ASM is not supported as the asm install scripts do not support this yet. See https://github.com/GoogleCloudPlatform/anthos-service-mesh-packages/issues/480
+- Install of ASM is not supported for non GKE clusters.
+
+# Support
+
+Contact @arau for any support and bug reports and feedback.
+
+# References
+
+
+# Related Projects
 

@@ -25,7 +25,7 @@ steps:
       - "TF_VAR_project_id=${PROJECT_ID}"
       - "PROJECT_ID=${PROJECT_ID}"
       - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}"
-      - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
+      - "GCP_AZS=${_GCP_AZS}"
     dir: gke-gcp/${_GCP_REGION_NAME}/${_ENVIRONMENT_NAME}/1_vpc
   - name: 'gcr.io/${PROJECT_ID}/simple-anthos-build:latest'
     id: '2_gke'
@@ -36,7 +36,7 @@ steps:
       - "TF_VAR_project_id=${PROJECT_ID}"
       - "PROJECT_ID=${PROJECT_ID}"
       - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}"
-      - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
+      - "GCP_AZS=${_GCP_AZS}"
     dir: gke-gcp/${_GCP_REGION_NAME}/${_ENVIRONMENT_NAME}/2_gke
   - name: 'gcr.io/${PROJECT_ID}/simple-anthos-build:latest'
     id: '3_workload_identity'
@@ -47,7 +47,7 @@ steps:
       - "TF_VAR_project_id=${PROJECT_ID}"
       - "PROJECT_ID=${PROJECT_ID}" 
       - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}"
-      - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
+      - "GCP_AZS=${_GCP_AZS}"
     dir: gke-gcp/${_GCP_REGION_NAME}/${_ENVIRONMENT_NAME}/3_workload_identity
   - name: 'gcr.io/${PROJECT_ID}/simple-anthos-build:latest'
     id: '4_hub'
@@ -58,7 +58,7 @@ steps:
       - "TF_VAR_project_id=${PROJECT_ID}"
       - "PROJECT_ID=${PROJECT_ID}" 
       - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}"
-      - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
+      - "GCP_AZS=${_GCP_AZS}"
     dir: gke-gcp/${_GCP_REGION_NAME}/${_ENVIRONMENT_NAME}/4_hub
   - name: 'gcr.io/${PROJECT_ID}/simple-anthos-build:latest'
     id: '/5_acm'
@@ -69,9 +69,23 @@ steps:
       - "TF_VAR_project_id=${PROJECT_ID}"
       - "PROJECT_ID=${PROJECT_ID}"
       - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}"
-      - "GCP_AZS=us-central1-b,us-central1-c,us-central1-f"
+      - "GCP_AZS=${_GCP_AZS}"
+      - "ACM_REPO=${_ACM_REPO}"
     dir: gke-gcp/${_GCP_REGION_NAME}/${_ENVIRONMENT_NAME}/5_acm
+  - name: 'gcr.io/${PROJECT_ID}/simple-anthos-build:latest'
+    id: '/6_asm'
+    args: ['run-all','apply','--terragrunt-non-interactive']
+    env:
+      - "TF_IN_AUTOMATION=1"
+      - "TF_INPUT=false"
+      - "TF_VAR_project_id=${PROJECT_ID}"
+      - "PROJECT_ID=${PROJECT_ID}"
+      - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}"
+      - "GCP_AZS=${_GCP_AZS}"
+    dir: gke-gcp/${_GCP_REGION_NAME}/${_ENVIRONMENT_NAME}/6_asm
 substitutions:
   _ENVIRONMENT_NAME: dev
   _GCP_REGION_NAME: us-central1
+  _GCP_AZS: us-central1-b,us-central1-c,us-central1-f
+  _ACM_REPO: git@github.com:GoogleCloudPlatform/csp-config-management.git
 tags: ['cloud-builders-community']

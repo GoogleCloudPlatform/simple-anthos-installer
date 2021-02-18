@@ -75,6 +75,7 @@ steps:
       - "TF_VAR_project_id=${PROJECT_ID}"
       - "PROJECT_ID=${PROJECT_ID}"
       - "ENVIRONMENT_NAME=${_ENVIRONMENT_NAME}" 
+      - "ACM_REPO=${_ACM_REPO}"
     dir: eks-aws/${_AWS_REGION_NAME}/${_ENVIRONMENT_NAME}/5_acm
 # Get AWS secret from Secrets Manager
 availableSecrets:
@@ -86,4 +87,5 @@ availableSecrets:
 substitutions:
   _ENVIRONMENT_NAME: dev
   _AWS_REGION_NAME: us-east-1
+  _ACM_REPO: git@github.com:GoogleCloudPlatform/csp-config-management.git
 tags: ['cloud-builders-community']
