@@ -20,6 +20,7 @@ An Automated and Configurable Anthos Multi Cloud installer framework. Great for 
 # QuickStart 
 Check the [pre-requisites](#pre-requisites)  
 
+## Prep
 ```bash
 # Clone the repo
 git clone sso://user/arau/simple-anthos
@@ -32,24 +33,25 @@ gcloud config set core/project ${PROJECT_ID}
 # Specify the ACM repo to use. You can clone this one https://github.com/GoogleCloudPlatform/csp-config-management
 export ACM_REPO="git@github.com:your-git-repo/csp-config-management.git"
 
-# Build the Cloud Build container image which will store the image in your project GCR 
-cd cloudbuild/simple-anthos-build
- gcloud builds submit --config=cloudbuild.yaml
+```
+## Create the GKE Resources
+```bash
+# Create the GKE Cluster with Workload Identity, GKE Connect(Hub), ACM and ASM enabled.
+cd terragrunt/gke-gcp
+terragrunt run-all apply ----terragrunt-non-interactive
+```
 
-###### GKE Cluster ######
-# Create the GKE Cluster with Workload Identity, GKE Connect(Hub) and ACM enabled.
-cd ../..
-gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m --substitutions=_ASM_REPO=$ACM_REPO
-#####  EKS Cluster ######
-# Setup AWS credentials in Secrets Manager
-printf $AWS_ACCESS_KEY_ID | gcloud secrets create aws-access-key --data-file=-
-printf $AWS_SECRET_ACCESS_KEY | gcloud secrets create aws-secret-access-key --data-file=-
+##  Create EKS Resources
+```bash
 
-# Replace the REPLACE_WITH_PROJECT_ID string with your GCP project since Cloud Build does not yet support parameterizing secret paths
-sed -i 's@REPLACE_WITH_PROJECT_ID@'"$PROJECT_ID"'@' cloudbuild-eks-dev-deploy.yaml
+# Setup AWS credentials 
+export AWS_ACCESS_KEY_ID="aws-secret-key-id"
+export AWS_SECRET_ACCESS_KEY="aws-secret-key"
+
 
 # Create the EKS Cluster connected with GKE Connect(Hub) and ACM enabled.
-gcloud builds submit . --config=cloudbuild-eks-dev-deploy.yaml --timeout=30m --substitutions=_ASM_REPO=$ACM_REPO
+cd terragrunt/eks-aws
+terragrunt run-all apply ----terragrunt-non-interactive
 
 ```
 This will create 2 clusters named `gke-dev-01` and `remote-dev-$PROJECT_ID` in GKE and EKS respectively connected .
@@ -64,12 +66,14 @@ This will create 2 clusters named `gke-dev-01` and `remote-dev-$PROJECT_ID` in G
   - [Goals](#goals)
 - [What can it Install?](#what-can-it-install)
 - [QuickStart](#quickstart)
+  - [Prep](#prep)
+  - [Create the GKE Resources](#create-the-gke-resources)
+  - [Create EKS Resources](#create-eks-resources)
 - [Table of Contents](#table-of-contents)
-  - [Pre-requisites](#pre-requisites)
-    - [Local Machine](#local-machine)
-    - [GCP Requirements](#gcp-requirements)
-    - [Cloud Build Container image](#cloud-build-container-image)
-    - [Clone (or create) a git repo you want to use for ACM](#clone-or-create-a-git-repo-you-want-to-use-for-acm)
+- [Pre-requisites](#pre-requisites)
+  - [Local Machine](#local-machine)
+  - [GCP Requirements](#gcp-requirements)
+  - [Clone (or create) a git repo you want to use for ACM](#clone-or-create-a-git-repo-you-want-to-use-for-acm)
 - [Detailed Usage](#detailed-usage)
   - [1. Create GKE Cluster on GCP](#1-create-gke-cluster-on-gcp)
     - [ACM](#acm)
@@ -97,15 +101,21 @@ This will create 2 clusters named `gke-dev-01` and `remote-dev-$PROJECT_ID` in G
 <br/>
 <br/>
 
-## Pre-requisites
-### Local Machine 
+# Pre-requisites
+## Local Machine 
+
+- Terraform 0.13.x
+- Terragrunt 0.28.x
+- gcloud
+- awscli
+
 
 - [gcloud](https://cloud.google.com/sdk/docs/install) installed and configured with a GCP project.
 ```bash
 export PROJECT_ID="<GCP_PROJECTID>"
 gcloud config set core/project ${PROJECT_ID}  
 ```
-### GCP Requirements
+## GCP Requirements
 
 - Following APIs are Enabled:
   - Compute
@@ -114,34 +124,25 @@ gcloud config set core/project ${PROJECT_ID}
   - Anthos
   - Secrets Manager (to store AWS credentials)
   
-- Ensure the following roles for the Cloud Build Service account:
 
-![](images/cloudbuild-service-account.png)
-
-Or go YOLO and give it Owner privilage (not recemmended)
-
-### Cloud Build Container image
-We need to build the container image used for our Cloud Build deploy to use. This is one time step which will store the container image in GCR in your project and will be used to create our infrastructure. The container image has gcloud, terraform, terragrunt and aws-cli installed. 
-
-```bash
- 
- cd cloudbuild/simple-anthos-build
- gcloud builds submit --config=cloudbuild.yaml
-
-```
-
-### Clone (or create) a git repo you want to use for ACM
+## Clone (or create) a git repo you want to use for ACM
 
 By default it uses the reference repo [git@github.com:GoogleCloudPlatform/csp-config-management.git](https://github.com/GoogleCloudPlatform/csp-config-management)
 
 To change this to use your own repo, clone the above [repo](https://github.com/GoogleCloudPlatform/csp-config-management) and modify the `sync_repo` variable in the  files  [gke-gcp/us-central1/dev/5_acm/terragrunt.hcl](gke-gcp/us-central1/dev/5_acm/terragrunt.hcl#51) and [eks-aws/us-east-1/dev/5_acm/terragrunt.hcl](eks-aws/us-east-1/dev/5_acm/terragrunt.hcl#80) to point to your repo.
+
+<br/>
+
+
+
 # Detailed Usage
 
 ## 1. Create GKE Cluster on GCP
 From the root git folder
 
 ```bash
-gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
+cd terragrunt/gke-gcp
+terragrunt run-all apply ----terragrunt-non-interactive
 ```
 
 Go get some ☕ and if all goes well, in about 20 minutes, you should see this on the Anthos console in the Clusters view:
@@ -291,11 +292,6 @@ The `aws-eks` directory is structured as similar but has a directory `terraform`
 
 # Development and Testing (only tested on Linux)
 
-Make sure you have the following installed:
-- Terraform 0.13.x
-- Terragrunt 0.28.x
-- gcloud
-- awscli
 
 ## Validating the scripts
 
