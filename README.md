@@ -18,7 +18,7 @@ An Automated and Configurable Anthos Multi Cloud installer framework. Great for 
 - An EKS Cluster on AWS in a dedicated VPC with [GKE Connect](https://cloud.google.com/anthos/multicluster-management/connect/overview) and [Anthos Config Management (ACM)](https://cloud.google.com/anthos/config-management) enabled. Also creates a Kubernetes Service Account to use to login to the GCP console.
 
 # QuickStart 
-Check the [pre-requisites](#pre-requisites)  
+Install gcloud, Terraform, Terragrunt, awscli (if EKS required). Check the [pre-requisites](#pre-requisites)  
 
 ## Prep
 ```bash
@@ -78,8 +78,6 @@ This will create 2 clusters named `gke-dev-01` and `remote-dev-$PROJECT_ID` in G
   - [1. Create GKE Cluster on GCP](#1-create-gke-cluster-on-gcp)
     - [ACM](#acm)
   - [2. Create EKS Cluster on AWS](#2-create-eks-cluster-on-aws)
-    - [AWS Credentials](#aws-credentials)
-    - [Update project path in cloudbuild-eks-dev-deploy.yaml](#update-project-path-in-cloudbuild-eks-dev-deployyaml)
     - [Login to the Cluster in GCP Console](#login-to-the-cluster-in-gcp-console)
     - [ACM](#acm-1)
   - [Enjoy!](#enjoy)
@@ -160,39 +158,17 @@ Once you have updated the SSH public key successfully, in the Anthos Config Mana
 
 ## 2. Create EKS Cluster on AWS 
 
-### AWS Credentials
-
-In order to create AWS resources the AWS Account credentials are stored in Secrets Manager. 
-
-Sample script to store the creds.
-
 ```bash
-# Setup AWS credentials in Secrets Manager
-printf $AWS_ACCESS_KEY_ID | gcloud secrets create aws-access-key --data-file=-
-printf $AWS_SECRET_ACCESS_KEY | gcloud secrets create aws-secret-access-key --data-file=-
-```
 
-### Update project path in cloudbuild-eks-dev-deploy.yaml
+# Setup AWS credentials 
+export AWS_ACCESS_KEY_ID="aws-secret-key-id"
+export AWS_SECRET_ACCESS_KEY="aws-secret-key"
 
-CloudBuild has made it [easier to access secrets](https://cloud.google.com/build/docs/securing-builds/use-secrets#configuring_builds_to_access_the_secret_from) but the GCP `PROJECT_ID` parameter is not configurable and hence needs to be changed in the build yaml.
 
-Modify the following section below to reflect the PROJECT_ID where the AWS credentials are stored.
+# Create the EKS Cluster connected with GKE Connect(Hub) and ACM enabled.
+cd terragrunt/eks-aws
+terragrunt run-all apply ----terragrunt-non-interactive
 
-```yaml
-availableSecrets:
-  secretManager:
-  - versionName: projects/REPLACE_WITH_PROJECT_ID/secrets/aws_access_key_id/versions/latest
-    env: 'AWS_ACCESS_KEY_ID'
-  - versionName: projects/REPLACE_WITH_PROJECT_ID/secrets/aws_secret_access_key/versions/latest
-    env: 'AWS_SECRET_ACCESS_KEY'
-```
-
-```bash
-# Replace the REPLACE_WITH_PROJECT_ID string with your GCP project since Cloud Build does not yet support passing environment variables in secret paths
-sed -i 's@REPLACE_WITH_PROJECT_ID@'"$PROJECT_ID"'@' cloudbuild-eks-dev-deploy.yaml
-
-### Deploy
- gcloud builds submit . --config=cloudbuild-eks-dev-deploy.yaml --timeout=30m
 ```
 
 ### Login to the Cluster in GCP Console
@@ -298,8 +274,10 @@ The `aws-eks` directory is structured as similar but has a directory `terraform`
 From the `gke-gcp` pr `eks-aws directory run:
 
 ```bash
-terragrunt validate-all
+terragrunt run-all validate
 ```
+
+A `terragrunt plan` can be done but it needs to be done separately in each numbered folder since there are dependencies in the some of the modules that needs to exist for a `plan` command to work.
 
 ## Deploying the infrastructure
 
@@ -315,6 +293,7 @@ terragrunt run-all apply --terragrunt-non-interactive
 
 - Clean Upgrade and Uninstall of ASM is not supported as the asm install scripts do not support this yet. See https://github.com/GoogleCloudPlatform/anthos-service-mesh-packages/issues/480
 - Install of ASM is not supported for non GKE clusters.
+- There are some Cloud Build scripts, you read the instructions [here](README-CloudBuild.md)
 
 # Support
 
