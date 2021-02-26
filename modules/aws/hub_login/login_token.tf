@@ -54,8 +54,8 @@ resource "kubernetes_cluster_role_binding" "ksa-admin-binding" {
 
 data "kubernetes_secret" "ksa_secret" {
   metadata {
-    name      = "${kubernetes_service_account.remote-admin-sa.default_secret_name}"
-    namespace = "${kubernetes_service_account.remote-admin-sa.metadata.0.namespace}"
+    name      = kubernetes_service_account.remote-admin-sa.default_secret_name
+    namespace = kubernetes_service_account.remote-admin-sa.metadata.0.namespace
   }
 }
 

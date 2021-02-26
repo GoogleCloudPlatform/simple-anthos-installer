@@ -18,7 +18,7 @@
 
 output "ksa_token" {
   description = "This the service account token to use to register this cluster in the Anthos console"
-  value       = "${lookup(data.kubernetes_secret.ksa_secret.data, "token", "")}"
+  value       = lookup(data.kubernetes_secret.ksa_secret.data, "token", "")
 }
 
 

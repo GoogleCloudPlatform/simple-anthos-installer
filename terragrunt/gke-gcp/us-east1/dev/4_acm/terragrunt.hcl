@@ -30,12 +30,12 @@ dependency "gke" {
 }
 
 dependencies {
-  paths = ["../3_workload_identity", "../4_hub", "../5_acm"]
+  paths = ["../3_hub"]
 }
 
 terraform {
 
-  source = "../../../../../modules/asm"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/acm?ref=v13.1.0"
 
 
 }
@@ -43,8 +43,13 @@ terraform {
 
 inputs = {
 
+
   cluster_name     = dependency.gke.outputs.name
   location         = dependency.gke.outputs.location
   cluster_endpoint = dependency.gke.outputs.endpoint
+
+  sync_repo   = get_env("ACM_REPO", "git@github.com:GoogleCloudPlatform/csp-config-management.git")
+  sync_branch = "1.0.0"
+  policy_dir  = "foo-corp"
 
 }

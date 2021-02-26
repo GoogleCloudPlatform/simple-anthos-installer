@@ -2,7 +2,7 @@
 
 # A Simple Anthos Installer
 
-An Automated and Configurable Anthos Multi Cloud installer framework. Great for quickly setting up a Demo or POC.
+A Customizable Anthos Multi Cloud installer framework. Great for quickly setting up a Demo or POC.
 
 ## Goals 
 - Provide starter scripts to install Anthos components with minimal manual steps.
@@ -27,11 +27,14 @@ git clone sso://user/arau/simple-anthos
 cd simple-anthos
 
 # Setup Project Env variables
-export PROJECT_ID="<GCP_PROJECTID>"
-gcloud config set core/project ${PROJECT_ID}  
+export PROJECT_ID="<GCP_PROJECTID>" # Mandatory
+gcloud config set core/project ${PROJECT_ID}  # Mandatory
+
+export GCP_REGION="gcp-region"  # Optional, Defaults to us-central1
+export GCP_AZS="az-1,az-2" # Optional. Defaults to us-central1-b,us-central1-c,us-central1-a
 
 # Specify the ACM repo to use. You can clone this one https://github.com/GoogleCloudPlatform/csp-config-management
-export ACM_REPO="git@github.com:your-git-repo/csp-config-management.git"
+export ACM_REPO="git@github.com:your-git-repo/csp-config-management.git" # Optional, Defaults to git@github.com:GoogleCloudPlatform/csp-config-management.git
 
 ```
 ## Create the GKE Resources
@@ -45,8 +48,9 @@ terragrunt run-all apply ----terragrunt-non-interactive
 ```bash
 
 # Setup AWS credentials 
-export AWS_ACCESS_KEY_ID="aws-secret-key-id"
-export AWS_SECRET_ACCESS_KEY="aws-secret-key"
+export AWS_ACCESS_KEY_ID="aws-secret-key-id" # Mandatory
+export AWS_SECRET_ACCESS_KEY="aws-secret-key" # Mandatory
+export AWS_REGION="aws-region" # Optional. Defaults to us-east-1
 
 
 # Create the EKS Cluster connected with GKE Connect(Hub) and ACM enabled.
@@ -87,9 +91,10 @@ This will create 2 clusters named `gke-dev-01` and `remote-dev-$PROJECT_ID` in G
     - [To change the region:](#to-change-the-region)
     - [Modify/Add a New Environment:](#modifyadd-a-new-environment)
   - [AWS Directory Structure](#aws-directory-structure)
-- [Development and Testing (only tested on Linux)](#development-and-testing-only-tested-on-linux)
+  - [Terraform State](#terraform-state)
+- [Development and Testing](#development-and-testing)
   - [Validating the scripts](#validating-the-scripts)
-  - [Deploying the infrastructure](#deploying-the-infrastructure)
+  - [Incrementally building the infrastructure](#incrementally-building-the-infrastructure)
 - [Known Issues](#known-issues)
 - [Support](#support)
 - [References](#references)
@@ -140,7 +145,7 @@ From the root git folder
 
 ```bash
 cd terragrunt/gke-gcp
-terragrunt run-all apply ----terragrunt-non-interactive
+terragrunt run-all apply --terragrunt-non-interactive
 ```
 
 Go get some ☕ and if all goes well, in about 20 minutes, you should see this on the Anthos console in the Clusters view:
@@ -167,7 +172,7 @@ export AWS_SECRET_ACCESS_KEY="aws-secret-key"
 
 # Create the EKS Cluster connected with GKE Connect(Hub) and ACM enabled.
 cd terragrunt/eks-aws
-terragrunt run-all apply ----terragrunt-non-interactive
+terragrunt run-all apply --terragrunt-non-interactive
 
 ```
 
@@ -193,12 +198,12 @@ Now you have a 2 clusters connected to an envrion (your GCP project) with ACM en
 
 ## Cleanup
 ```bash
-gcloud builds submit . --config=cloudbuild-eks-dev-destroy.yaml --timeout=30m
-
-gcloud builds submit . --config=cloudbuild-gke-dev-destroy.yaml --timeout=30m
+# From terragrunt/eks-aws or terragrunt/gke-gcp directory
+cd terragrunt/eks-aws
+terragrunt run-all destroy --terragrunt-non-interactive --terragrunt-ignore-dependency-errors
 ```
 
-The above cleanup will fail if your project adds additional firewall rules that this script did not create which will prevent the VPC from being deleted. Easier way would be to use a dedicated project and delete the project when you are finished with it.
+The above cleanup will fail deleting the vpc if your project adds additional firewall rules that this script did not create which will prevent the VPC from being deleted. Easier way would be to use a dedicated project and delete the project when you are finished with it.
 
 
 # Customization and Extending
@@ -208,27 +213,27 @@ The above cleanup will fail if your project adds additional firewall rules that 
 This project creates a dev environment 
 ## GKE Directory Structure 
 
-The `gke-gcp` directory is structured as follows:
+The `terragrunt/gke-gcp` directory is structured as follows:
 
 ```bash
 ├── account.hcl
-└── us-central1
+└── us-east1
     ├── dev
-    │   ├── 1_vpc
-    │   │   └── terragrunt.hcl
-    │   ├── 2_gke
-    │   │   └── terragrunt.hcl
-    │   ├── 3_workload_identity
-    │   │   └── terragrunt.hcl
-    │   ├── 4_hub
-    │   │   └── terragrunt.hcl
-    │   ├── 5_acm
-    │   │   └── terragrunt.hcl
-    │   └── env.hcl
+    │   ├── 1_vpc
+    │   │   └── terragrunt.hcl
+    │   ├── 2_gke
+    │   │   └── terragrunt.hcl
+    │   ├── 3_hub
+    │   │   └── terragrunt.hcl
+    │   ├── 4_acm
+    │   │   └── terragrunt.hcl
+    │   ├── 5_asm
+    │   │   └── terragrunt.hcl
+    │   └── env.hcl
     └── region.hcl
 ```
 
-It is organized by region (us-central1) and under that an environment (dev). The GCP account credentials, region and environment name is configured in the `account.hcl`, `region.hcl` and `env.hcl` files respectively. These `.hcl` provide sensible defaults which can be overriden using environment variables.
+It is organized by region (us-east1) and under that an environment (dev). The GCP account credentials, region and environment name is configured in the `account.hcl`, `region.hcl` and `env.hcl` files respectively. These `.hcl` provide sensible defaults which can be overriden using environment variables.
 
 The numbering scheme for the directories is a best practice to document the order of deployment.
 
@@ -238,18 +243,14 @@ The numbering scheme for the directories is a best practice to document the orde
 
 ### Modify/Add a New Environment:
 - Change `environment_name` variable in the [env.hcl](gke-gcp/us-central1/dev/env.hcl)  
- - Rename/Copy the directory `dev` to your desired environment name. This has no effect on the code. This is for purely documenting your code to reflect the environment.
+- Rename/Copy the directory `dev` to your desired environment name. This has no effect on the code. This is for purely documenting your code to reflect the environment.
 
 
 ## AWS Directory Structure 
-The `aws-eks` directory is structured as similar but has a directory `terraform` that contains code to create a EKS Cluster:
+The `terragrunt/aws-eks` directory is structured as similarly:
 
 ```bash
 ├── account.hcl
-├── terraform
-│   ├── eks
-│   ├── hub_login
-│   └── vpc
 └── us-east-1
     ├── dev
     │   ├── 1_vpc
@@ -266,7 +267,10 @@ The `aws-eks` directory is structured as similar but has a directory `terraform`
     └── region.hcl
 ```
 
-# Development and Testing (only tested on Linux)
+## Terraform State 
+
+The Terraform state is stored in GCS bucket with the naming convention `terraform-state-dev-$PROJECT_ID-$REGION`. The directory structure will match the directory structure above.
+# Development and Testing
 
 
 ## Validating the scripts
@@ -279,11 +283,11 @@ terragrunt run-all validate
 
 A `terragrunt plan` can be done but it needs to be done separately in each numbered folder since there are dependencies in the some of the modules that needs to exist for a `plan` command to work.
 
-## Deploying the infrastructure
+## Incrementally building the infrastructure
 
 You can deploy all the infrastructure for a specific cloud provider or one module at a time.  
 
-From a numbered directory or its parent, run:
+From a numbered directory `(1_xx)` or its parent, run:
 
 ```bash
 terragrunt run-all apply --terragrunt-non-interactive

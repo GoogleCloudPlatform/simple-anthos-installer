@@ -91,3 +91,11 @@ sed -i 's@REPLACE_WITH_PROJECT_ID@'"$PROJECT_ID"'@' cloudbuild-eks-dev-deploy.ya
 ### Deploy
  gcloud builds submit . --config=cloudbuild-eks-dev-deploy.yaml --timeout=30m
 ```
+
+## Cleanup
+```bash
+gcloud builds submit . --config=cloudbuild-eks-dev-destroy.yaml --timeout=30m
+
+gcloud builds submit . --config=cloudbuild-gke-dev-destroy.yaml --timeout=30m
+```
+

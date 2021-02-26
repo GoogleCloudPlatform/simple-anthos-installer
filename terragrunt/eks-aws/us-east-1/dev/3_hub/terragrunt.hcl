@@ -30,7 +30,6 @@ locals {
   #Get the GCP project ID
   project_id = local.account_vars.locals.project_id
 
-  cluster_name = "remote-${local.environment_name}-${local.project_id}-1"
 }
 
 
@@ -43,21 +42,21 @@ dependency "eks" {
   mock_outputs_allowed_terraform_commands = ["validate"]
   mock_outputs = {
 
-    cluster_name            = ["fake"]
-    cluster_endpoint        = ["fake"]
-    region                  = ["fake"]
-    gke_hub_membership_name = ["fake"]
+    cluster_name            = "fake"
+    cluster_endpoint        = "fake"
+    region                  = "fake"
+    gke_hub_membership_name = "fake"
   }
 }
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/hub?ref=v13.0.0"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/hub?ref=v13.1.0"
 
   # Before apply and plan to set the current kubetctl context to the eks cluster
   before_hook "before_hook_1" {
     commands = ["apply", "plan"]
-    execute  = ["aws", "eks", "--region", "${local.aws_region}", "update-kubeconfig", "--name", "${local.cluster_name}"]
+    execute  = ["aws", "eks", "--region", "${local.aws_region}", "update-kubeconfig", "--name", "${dependency.eks.outputs.cluster_name}"]
   }
 
 }
