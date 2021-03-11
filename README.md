@@ -2,46 +2,60 @@
 
 # A Simple Anthos Installer
 
-A Customizable Anthos Multi Cloud installer framework. Great for quickly setting up a Demo or POC.
+A Customizable Anthos Multi Cloud installer framework. Great for quickly setting up a Demo or POC. 
 
-## Goals 
+**Note: This is not an officially supported Google product.**
+
+## 🥅  Goals 
 - Provide starter scripts to install Anthos components with minimal manual steps.
 - Use [CFT](https://cloud.google.com/foundation-toolkit) Terraform modules that follow GCP best practices.
 - Adding/modifying/removing Anthos/GCP components should be painless.
 - Use of small modules so each one can be deployed and debugged independently
   
 
-# What can it Install?
+# ❓ What can it Install? 
  
 - A Regional GKE Cluster on GCP in a dedicated VPC with [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity), [GKE Connect](https://cloud.google.com/anthos/multicluster-management/connect/overview), [Anthos Config Management (ACM)](https://cloud.google.com/anthos/config-management) and [Anthos Service Mesh (ACM)](https://cloud.google.com/service-mesh/docs/overview) enabled.
 
 - An EKS Cluster on AWS in a dedicated VPC with [GKE Connect](https://cloud.google.com/anthos/multicluster-management/connect/overview) and [Anthos Config Management (ACM)](https://cloud.google.com/anthos/config-management) enabled. Also creates a Kubernetes Service Account to use to login to the GCP console.
 
-# QuickStart 
+# 🚀 Quickest Quickstart 
+
+The quickest way to get an environment without installing any tools except git and gcloud is to use CloudBuild. See [README-CloudBuild.md](README-CloudBuild.md) for details.
+<br/>
+<br/>
+
+# 🤓  Quickstart (tested on Linux)
 Install gcloud, Terraform, Terragrunt, awscli (if EKS required). Check the [pre-requisites](#pre-requisites)  
 
-## Prep
+
+## 🖥️  Prepare
 ```bash
 # Clone the repo
 git clone sso://user/arau/simple-anthos
 cd simple-anthos
 
+# Make sure authenticate with Application default login as this required for the google provider. See https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#authentication
+gcloud auth application-default login # Mandatory
+
 # Setup Project Env variables
 export PROJECT_ID="<GCP_PROJECTID>" # Mandatory
 gcloud config set core/project ${PROJECT_ID}  # Mandatory
 
-export GCP_REGION="gcp-region"  # Optional, Defaults to us-central1
-export GCP_AZS="az-1,az-2" # Optional. Defaults to us-central1-b,us-central1-c,us-central1-a
+export GCP_REGION="gcp-region"  # Optional, Defaults to us-east1
+export GCP_AZS="az-1,az-2" # Optional. Defaults to us-east1-b,us-east1-c,us-east1-d
 
+# Install kpt tool required for ASM install
+sudo apt-get install google-cloud-sdk-kpt
 # Specify the ACM repo to use. You can clone this one https://github.com/GoogleCloudPlatform/csp-config-management
-export ACM_REPO="git@github.com:your-git-repo/csp-config-management.git" # Optional, Defaults to git@github.com:GoogleCloudPlatform/csp-config-management.git
+export ACM_REPO="git@github.com:your-git-repo/csp-config-management.git" # Mandatory if using ACM
 
 ```
 ## Create the GKE Resources
 ```bash
 # Create the GKE Cluster with Workload Identity, GKE Connect(Hub), ACM and ASM enabled.
 cd terragrunt/gke-gcp
-terragrunt run-all apply ----terragrunt-non-interactive
+terragrunt run-all apply --terragrunt-non-interactive
 ```
 
 ##  Create EKS Resources
@@ -55,10 +69,10 @@ export AWS_REGION="aws-region" # Optional. Defaults to us-east-1
 
 # Create the EKS Cluster connected with GKE Connect(Hub) and ACM enabled.
 cd terragrunt/eks-aws
-terragrunt run-all apply ----terragrunt-non-interactive
+terragrunt run-all apply --terragrunt-non-interactive
 
 ```
-This will create 2 clusters named `gke-dev-01` and `remote-dev-$PROJECT_ID` in GKE and EKS respectively connected .
+This will create 2 clusters named `gke-dev-01` and `eks-dev-01` in GKE and EKS respectively connected to GKE Hub. 
 
 <br/>
 <br/>
@@ -67,10 +81,11 @@ This will create 2 clusters named `gke-dev-01` and `remote-dev-$PROJECT_ID` in G
 
 <!-- toc -->
 - [A Simple Anthos Installer](#a-simple-anthos-installer)
-  - [Goals](#goals)
-- [What can it Install?](#what-can-it-install)
-- [QuickStart](#quickstart)
-  - [Prep](#prep)
+  - [🥅  Goals](#--goals)
+- [❓ What can it Install?](#-what-can-it-install)
+- [🚀 Quickest Quickstart](#-quickest-quickstart)
+- [🤓  Quickstart (tested on Linux)](#--quickstart-tested-on-linux)
+  - [🖥️  Prepare](#️--prepare)
   - [Create the GKE Resources](#create-the-gke-resources)
   - [Create EKS Resources](#create-eks-resources)
 - [Table of Contents](#table-of-contents)
@@ -81,6 +96,7 @@ This will create 2 clusters named `gke-dev-01` and `remote-dev-$PROJECT_ID` in G
 - [Detailed Usage](#detailed-usage)
   - [1. Create GKE Cluster on GCP](#1-create-gke-cluster-on-gcp)
     - [ACM](#acm)
+    - [ASM](#asm)
   - [2. Create EKS Cluster on AWS](#2-create-eks-cluster-on-aws)
     - [Login to the Cluster in GCP Console](#login-to-the-cluster-in-gcp-console)
     - [ACM](#acm-1)
@@ -111,13 +127,14 @@ This will create 2 clusters named `gke-dev-01` and `remote-dev-$PROJECT_ID` in G
 - Terragrunt 0.28.x
 - gcloud
 - awscli
-
-
 - [gcloud](https://cloud.google.com/sdk/docs/install) installed and configured with a GCP project.
+
+  
 ```bash
 export PROJECT_ID="<GCP_PROJECTID>"
 gcloud config set core/project ${PROJECT_ID}  
 ```
+- kpt installed using `sudo apt-get install google-cloud-sdk-kpt` see [this]((https://github.com/GoogleCloudPlatform/anthos-service-mesh-packages/tree/master/scripts/asm-installer#prerequisites-for-install_asm)) for more details. You may need to install the other tools manually depending on hot gcloud was installed.
 ## GCP Requirements
 
 - Following APIs are Enabled:
@@ -160,7 +177,11 @@ You will need to configure the cluster's ACM SSH public key on your git config m
 Once you have updated the SSH public key successfully, in the Anthos Config Management screen, you should see the following:
 ![](images/acm.png)
 
+### ASM
 
+You will have to enable sidecar injection into the namespaces you want by following the directions here: https://cloud.google.com/service-mesh/docs/scripted-install/gke-install#deploying_and_redeploying_workloads
+
+  
 ## 2. Create EKS Cluster on AWS 
 
 ```bash
