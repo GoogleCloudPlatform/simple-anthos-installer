@@ -2,7 +2,7 @@
 
 # A Simple Anthos Installer
 
-A Customizable Anthos Multi Cloud installer framework. Great for quickly setting up a Demo or POC. 
+A GitOps based Anthos Multi Cloud installer framework. 
 
 **Note: This is not an officially supported Google product.**
 
@@ -11,6 +11,7 @@ A Customizable Anthos Multi Cloud installer framework. Great for quickly setting
 - Use [CFT](https://cloud.google.com/foundation-toolkit) Terraform modules that follow GCP best practices.
 - Adding/modifying/removing Anthos/GCP components should be painless.
 - Use of small modules so each one can be deployed and debugged independently
+- GitOps enabled.
   
 
 # ❓ What can it Install? 
@@ -296,7 +297,7 @@ The Terraform state is stored in GCS bucket with the naming convention `terrafor
 
 ## Validating the scripts
 
-From the `gke-gcp` pr `eks-aws directory run:
+From the `gke-gcp` or `eks-aws` directory run:
 
 ```bash
 terragrunt run-all validate
@@ -325,7 +326,11 @@ terragrunt run-all apply --terragrunt-non-interactive
 Contact @arau for any support and bug reports and feedback.
 
 # References
+Videos: 
+- [Automated, modularized and versioned infrastructure with Terraform and Terragrunt](https://youtu.be/sOK-dJ20u04)
+- [5 Lessons Learned From Writing Over 300,000 Lines of Infrastructure Code](https://youtu.be/RTEgE2lcyk4)
 
 
 # Related Projects
-
+- [anthos-multicloud-workshop](https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop)
+- 
