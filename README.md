@@ -33,8 +33,8 @@ Install gcloud, Terraform, Terragrunt, awscli (if EKS required). Check the [pre-
 ## 🖥️  Prepare
 ```bash
 # Clone the repo
-git clone sso://user/arau/simple-anthos
-cd simple-anthos
+git clone https://github.com/GoogleCloudPlatform/simple-anthos-installer
+cd simple-anthos-installer
 
 # Make sure authenticate with Application default login as this required for the google provider. See https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/provider_reference#authentication
 gcloud auth application-default login # Mandatory
@@ -78,7 +78,7 @@ This will create 2 clusters named `gke-dev-01` and `eks-dev-01` in GKE and EKS r
 <br/>
 <br/>
 
-# Table of Contents
+# Detailed Instructions
 
 <!-- toc -->
 - [A Simple Anthos Installer](#a-simple-anthos-installer)
@@ -89,7 +89,7 @@ This will create 2 clusters named `gke-dev-01` and `eks-dev-01` in GKE and EKS r
   - [🖥️  Prepare](#️--prepare)
   - [Create the GKE Resources](#create-the-gke-resources)
   - [Create EKS Resources](#create-eks-resources)
-- [Table of Contents](#table-of-contents)
+- [Detailed Instructions](#detailed-instructions)
 - [Pre-requisites](#pre-requisites)
   - [Local Machine](#local-machine)
   - [GCP Requirements](#gcp-requirements)
@@ -113,9 +113,10 @@ This will create 2 clusters named `gke-dev-01` and `eks-dev-01` in GKE and EKS r
   - [Validating the scripts](#validating-the-scripts)
   - [Incrementally building the infrastructure](#incrementally-building-the-infrastructure)
 - [Known Issues](#known-issues)
-- [Support](#support)
+- [Contributing](#contributing)
 - [References](#references)
 - [Related Projects](#related-projects)
+- [Licence](#licence)
 
 <!-- tocstop -->
 <br/>
@@ -135,7 +136,7 @@ This will create 2 clusters named `gke-dev-01` and `eks-dev-01` in GKE and EKS r
 export PROJECT_ID="<GCP_PROJECTID>"
 gcloud config set core/project ${PROJECT_ID}  
 ```
-- kpt installed using `sudo apt-get install google-cloud-sdk-kpt` see [this]((https://github.com/GoogleCloudPlatform/anthos-service-mesh-packages/tree/master/scripts/asm-installer#prerequisites-for-install_asm)) for more details. You may need to install the other tools manually depending on hot gcloud was installed.
+- kpt installed using `sudo apt-get install google-cloud-sdk-kpt` see [this](https://github.com/GoogleCloudPlatform/anthos-service-mesh-packages/tree/master/scripts/asm-installer#prerequisites-for-install_asm) for more details. You may need to install the other tools manually depending on how gcloud was installed.
 ## GCP Requirements
 
 - Following APIs are Enabled:
@@ -241,6 +242,8 @@ The `terragrunt/gke-gcp` directory is structured as follows:
 ├── account.hcl
 └── us-east1
     ├── dev
+    │   ├── 0_activate-apis
+    │   │   └── terragrunt.hcl
     │   ├── 1_vpc
     │   │   └── terragrunt.hcl
     │   ├── 2_gke
@@ -255,7 +258,13 @@ The `terragrunt/gke-gcp` directory is structured as follows:
     └── region.hcl
 ```
 
-It is organized by region (us-east1) and under that an environment (dev). The GCP account credentials, region and environment name is configured in the `account.hcl`, `region.hcl` and `env.hcl` files respectively. These `.hcl` provide sensible defaults which can be overriden using environment variables.
+It is organized by region (us-east1 in this case) and under that an environment (dev). 
+
+- `account.hcl` : contains GCP project details
+- `region.hcl` : contains GCP region and AZ details
+- `env.hcl` : environment name set to `dev` by default
+
+These `.hcl` provide sensible defaults which can be overriden using environment variables.
 
 The numbering scheme for the directories is a best practice to document the order of deployment.
 
@@ -265,7 +274,7 @@ The numbering scheme for the directories is a best practice to document the orde
 
 ### Modify/Add a New Environment:
 - Change `environment_name` variable in the [env.hcl](gke-gcp/us-central1/dev/env.hcl)  
-- Rename/Copy the directory `dev` to your desired environment name. This has no effect on the code. This is for purely documenting your code to reflect the environment.
+- Copy the directory `dev` and rename it to your desired environment name. Reanming the directory has no effect on the code. This is for purely documenting your code to reflect the environment. It is best practice to name the directories (region and environment) to the same as the one in the `.hcl` files.
 
 
 ## AWS Directory Structure 
@@ -294,7 +303,6 @@ The `terragrunt/aws-eks` directory is structured as similarly:
 The Terraform state is stored in GCS bucket with the naming convention `terraform-state-dev-$PROJECT_ID-$REGION`. The directory structure will match the directory structure above.
 # Development and Testing
 
-
 ## Validating the scripts
 
 From the `gke-gcp` or `eks-aws` directory run:
@@ -321,9 +329,9 @@ terragrunt run-all apply --terragrunt-non-interactive
 - Install of ASM is not supported for non GKE clusters.
 - There are some Cloud Build scripts, you read the instructions [here](README-CloudBuild.md)
 
-# Support
+# Contributing
 
-Contact @arau for any support and bug reports and feedback.
+Bug reports and feedback welcome. Please see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 # References
 Videos: 
@@ -333,4 +341,6 @@ Videos:
 
 # Related Projects
 - [anthos-multicloud-workshop](https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop)
-- 
+  
+# Licence 
+Apache 2.0
