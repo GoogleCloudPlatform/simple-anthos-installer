@@ -27,41 +27,48 @@ generate "backend" {
     }
   EOF
 }
+
+
 locals {
+
+  # Automatically load region-level variables
+  region_vars = read_terragrunt_config(find_in_parent_folders("region.hcl"))
+
   # Automatically load environment-level variables
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+
+
   environment_name = local.environment_vars.locals.environment_name
+
+  region = local.region_vars.locals.region
+
 }
 
-
-dependency "gke" {
-
-  config_path = "../2_gke"
-
-  # Configure mock outputs for the `validate` command that are returned when there are no outputs available (e.g the
-  # module hasn't been applied yet.
-  mock_outputs_allowed_terraform_commands = ["validate"]
-  mock_outputs = {
-    name     = "fake"
-    location = "fake"
-    endpoint = "fake"
-  }
-}
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/hub?ref=v13.1.0"
+  source = "github.com/terraform-google-modules/terraform-google-project-factory//modules/project_services?ref=v10.1.1"
 }
 
-
 inputs = {
+  disable_services_on_destroy = false
+  activate_apis = [
+    "compute.googleapis.com",
+    "iam.googleapis.com",
+    "container.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "anthos.googleapis.com",
+    "cloudtrace.googleapis.com",
+    "meshca.googleapis.com",
+    "meshtelemetry.googleapis.com",
+    "meshconfig.googleapis.com",
+    "iamcredentials.googleapis.com",
+    "gkeconnect.googleapis.com",
+    "gkehub.googleapis.com",
+    "monitoring.googleapis.com",
+    "logging.googleapis.com",
+    "stackdriver.googleapis.com"
 
-
-  cluster_name            = dependency.gke.outputs.name
-  location                = dependency.gke.outputs.location
-  cluster_endpoint        = dependency.gke.outputs.endpoint
-  gke_hub_membership_name = dependency.gke.outputs.name
-  gke_hub_sa_name         = "gke-hub-sa-2"
-  labels                  = "env=${local.environment_name},location=${dependency.gke.outputs.location}"
+  ]
 
 }

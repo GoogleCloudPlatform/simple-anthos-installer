@@ -49,7 +49,7 @@ locals {
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-network?ref=v3.0.1"
+  source = "github.com/terraform-google-modules/terraform-google-network?ref=v3.3.0"
 }
 
 dependencies {

@@ -14,6 +14,11 @@
  * limitations under the License.
  */
  
+ /*
+ This file contains the common providers that are used by child terragrunt modules. 
+ It is best practice to use versioned providers so modify this file with care
+ */
+
 locals {
   # Automatically load project-level variables
   account_vars = read_terragrunt_config(find_in_parent_folders("account.hcl"))
@@ -43,13 +48,14 @@ generate "provider" {
     provider "google" {
       region = "${local.region}"
       project = "${local.project_id}"
+      version = "~> 3.70"
       
     }
 
     provider "google-beta" {
       region = "${local.region}"
       project = "${local.project_id}"
-      
+      version = "~> 3.70"
     }
 
     provider "aws" {
@@ -81,7 +87,9 @@ EOF
 
 # Configure terraform state to be stored in GCS,
 remote_state {
+  # Variable to control if the GCS bucket gets created or not. See https://terragrunt.gruntwork.io/docs/features/keep-your-remote-state-configuration-dry/
   disable_init = tobool(get_env("TERRAGRUNT_DISABLE_INIT", "false"))
+  
   backend      = "gcs"
   config = {
     project  = local.project_id
