@@ -41,18 +41,17 @@ gcloud auth application-default login # Mandatory
 
 # Setup Project Env variables
 export PROJECT_ID="<GCP_PROJECTID>" # Mandatory
-gcloud config set core/project ${PROJECT_ID}  # Mandatory
+gcloud config set core/project $PROJECT_ID  # Mandatory
 
 export GCP_REGION="gcp-region"  # Optional, Defaults to us-east1
 export GCP_AZS="az-1,az-2" # Optional. Defaults to us-east1-b,us-east1-c,us-east1-d
 
-# Install kpt tool required for ASM install
-sudo apt-get install google-cloud-sdk-kpt
 # Specify the ACM repo to use. You can clone this one https://github.com/GoogleCloudPlatform/csp-config-management
 export ACM_REPO="git@github.com:your-git-repo/csp-config-management.git" # Mandatory if using ACM
 
 ```
-## Create the GKE Resources
+## Use the example-gke-aws 
+# Create the GKE Resources
 ```bash
 # Create the GKE Cluster with Workload Identity, GKE Connect(Hub), ACM and ASM enabled.
 cd terragrunt/gke-gcp
@@ -87,7 +86,8 @@ This will create 2 clusters named `gke-dev-01` and `eks-dev-01` in GKE and EKS r
 - [🚀 Quickest Quickstart](#-quickest-quickstart)
 - [🤓  Quickstart (tested on Linux)](#--quickstart-tested-on-linux)
   - [🖥️  Prepare](#️--prepare)
-  - [Create the GKE Resources](#create-the-gke-resources)
+  - [Use the example-gke-aws](#use-the-example-gke-aws)
+- [Create the GKE Resources](#create-the-gke-resources)
   - [Create EKS Resources](#create-eks-resources)
 - [Detailed Instructions](#detailed-instructions)
 - [Pre-requisites](#pre-requisites)
@@ -338,9 +338,9 @@ Videos:
 - [Automated, modularized and versioned infrastructure with Terraform and Terragrunt](https://youtu.be/sOK-dJ20u04)
 - [5 Lessons Learned From Writing Over 300,000 Lines of Infrastructure Code](https://youtu.be/RTEgE2lcyk4)
 
-
 # Related Projects
+- [Terragrunt Infrastructure example](https://github.com/gruntwork-io/terragrunt-infrastructure-live-example)
 - [anthos-multicloud-workshop](https://gitlab.com/anthos-multicloud/anthos-multicloud-workshop)
-  
+
 # Licence 
 Apache 2.0

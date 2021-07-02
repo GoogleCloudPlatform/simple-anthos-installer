@@ -14,8 +14,12 @@
 
 repos:
 - repo: git://github.com/antonbabenko/pre-commit-terraform
-  rev: v1.45.0 # Get the latest from: https://github.com/antonbabenko/pre-commit-terraform/releases
+  rev: v1.48.0 # Get the latest from: https://github.com/antonbabenko/pre-commit-terraform/releases
   hooks:
     - id: terraform_fmt
     - id: terraform_docs
     - id: terragrunt_fmt
+- repo: git://github.com/pre-commit/pre-commit-hooks
+  rev: v3.4.0
+  hooks:
+    - id: check-merge-conflict

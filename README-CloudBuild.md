@@ -10,7 +10,11 @@ A Customizable Anthos Multi Cloud installer framework. Great for quickly setting
 
 # CloudBuild Instructions
 
-For instructions to deploy using old fashioned way of typing command see [README.md](README.md)
+Clone the repo 
+```bash
+git clone https://github.com/GoogleCloudPlatform/simple-anthos-installer
+```
+
 ## Roles
 
 - Ensure the following roles for the Cloud Build Service account:
@@ -23,9 +27,9 @@ Or go YOLO and give it Owner privilege (not recommended)
 We need to build the container image used for our Cloud Build deploy to use. This is one time step which will store the container image in GCR in your project and will be used to create our infrastructure. The container image has gcloud, terraform, terragrunt, install_asm dependencies and aws-cli installed. 
 
 ```bash
- 
- cd cloudbuild/simple-anthos-build
- gcloud builds submit --config=cloudbuild.yaml
+
+cd cloudbuild/simple-anthos-build
+gcloud builds submit --config=cloudbuild.yaml
 
 ```
 
@@ -33,8 +37,9 @@ We need to build the container image used for our Cloud Build deploy to use. Thi
 
 ```bash
 # Clone the repo
-git clone sso://user/arau/simple-anthos
-cd simple-anthos
+git clone https://github.com/GoogleCloudPlatform/simple-anthos-installer
+
+cd simple-anthos-installer
 
 # Setup Project Env variables
 export PROJECT_ID="<GCP_PROJECTID>"
