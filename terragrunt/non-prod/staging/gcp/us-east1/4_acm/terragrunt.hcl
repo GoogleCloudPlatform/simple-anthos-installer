@@ -49,7 +49,7 @@ dependencies {
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm?ref=v14.3.0"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm?ref=v15.0.0"
 
 
 }
@@ -62,7 +62,7 @@ inputs = {
   location         = dependency.gke.outputs.location
   cluster_endpoint = dependency.gke.outputs.endpoint
 
-  sync_repo   = get_env("ACM_REPO", "git@github.com:GoogleCloudPlatform/csp-config-management.git")
+  sync_repo   = get_env("ACM_REPO", "")
   sync_branch = "1.0.0"
   policy_dir  = "foo-corp"
 

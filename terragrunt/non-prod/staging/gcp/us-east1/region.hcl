@@ -17,6 +17,6 @@
 
 locals {
   region             = "us-east1" # GCP Region
-  availability_zones = "us-east1-b,us-east1-c,us-east1-d"
+  availability_zones = split(",", "us-east1-b,us-east1-c,us-east1-d")
   aws_region         = "us-east-1" #AWS Region - not used by GKE install but required so Terragrunt is happy
 }

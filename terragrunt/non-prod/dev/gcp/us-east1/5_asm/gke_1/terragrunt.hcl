@@ -49,7 +49,7 @@ dependencies {
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/asm?ref=v14.3.0"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/asm?ref=v15.0.0"
 
 
 }
@@ -60,6 +60,7 @@ inputs = {
   cluster_name     = dependency.gke.outputs.name
   location         = dependency.gke.outputs.location
   cluster_endpoint = dependency.gke.outputs.endpoint
+  enable_all       = true
   asm_version      = "1.9"
 
 }

@@ -64,7 +64,7 @@ dependency "vpc" {
 
 terraform {
 
-  source = "../../../../../../modules/aws/eks"
+  source = "."
 
 }
 

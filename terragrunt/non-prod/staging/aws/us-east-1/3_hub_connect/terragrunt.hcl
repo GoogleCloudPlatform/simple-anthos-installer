@@ -66,7 +66,7 @@ dependency "eks" {
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/hub?ref=v13.1.0"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/hub?ref=v15.0.0"
 
   # Before apply and plan to set the current kubetctl context to the eks cluster
   before_hook "before_hook_1" {

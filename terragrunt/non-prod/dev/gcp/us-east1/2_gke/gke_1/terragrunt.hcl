@@ -53,28 +53,29 @@ dependency "vpc" {
   # module hasn't been applied yet.
   mock_outputs_allowed_terraform_commands = ["validate"]
   mock_outputs = {
-    network_name   = "mock-network"
+    network_name  = "mock-network"
     subnets_names = ["mock-subnetwork"]
   }
 }
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine?ref=v14.3.0"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine?ref=v15.0.0"
 }
 
 
 inputs = {
 
-  name              = "${local.cluster_type}-${local.environment_name}-01"
-  regional          = true
-  zones             = local.availability_zones
-  network           = dependency.vpc.outputs.network_name
-  subnetwork        = dependency.vpc.outputs.subnets_names[0]
-  ip_range_pods     = "${local.subnet_01}-secondary-range-01-pod"
-  ip_range_services = "${local.subnet_01}-secondary-range-02-svc"
-  service_account   = "create"
-  release_channel   = "REGULAR"
+  name                  = "${local.cluster_type}-${local.environment_name}-01"
+  regional              = true
+  zones                 = local.availability_zones
+  network               = dependency.vpc.outputs.network_name
+  subnetwork            = dependency.vpc.outputs.subnets_names[0]
+  ip_range_pods         = "${local.subnet_01}-secondary-range-01-pod"
+  ip_range_services     = "${local.subnet_01}-secondary-range-02-svc"
+  service_account       = "create"
+  release_channel       = "REGULAR"
+  enable_shielded_nodes = true
   node_pools = [
     {
       name         = "${local.cluster_type}-${local.environment_name}-01-pool"

@@ -64,7 +64,7 @@ dependency "eks" {
 
 dependencies {
 
-  paths = ["../3_hub_connect", ]
+  paths = ["../3_hub_connect"]
 }
 
 
@@ -89,7 +89,7 @@ EOF
 terraform {
 
   # For non GKE clusters we need to get create a KSA and create role bindings. This is done in the below module.
-  source = "../../../../../../modules/aws/hub_login"
+  source = "."
 
   # Before apply and plan, set the current kubetctl context to the eks cluster so we can run the command above.
   before_hook "before_hook_1" {

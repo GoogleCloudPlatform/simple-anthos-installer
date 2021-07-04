@@ -63,7 +63,7 @@ dependency "vpc" {
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine?ref=v14.3.0"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine?ref=v15.0.0"
 }
 
 

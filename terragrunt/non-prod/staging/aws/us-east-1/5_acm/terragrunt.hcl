@@ -71,7 +71,7 @@ dependencies {
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/acm?ref=v13.1.0"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine.git//modules/acm?ref=v15.0.0"
 
 
   # Before apply and plan to set the current kubetctl context to the eks cluster
@@ -91,7 +91,7 @@ inputs = {
   cluster_endpoint     = dependency.eks.outputs.cluster_endpoint
   use_existing_context = true
 
-  sync_repo   = get_env("ACM_REPO", "git@github.com:GoogleCloudPlatform/csp-config-management.git")
+  sync_repo   = get_env("ACM_REPO", "")
   sync_branch = "1.0.0"
   policy_dir  = "foo-corp"
 

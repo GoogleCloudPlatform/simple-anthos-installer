@@ -50,7 +50,7 @@ dependency "gke" {
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/hub?ref=v14.3.0"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/hub?ref=v15.0.0"
 }
 
 
@@ -61,7 +61,7 @@ inputs = {
   location                = dependency.gke.outputs.location
   cluster_endpoint        = dependency.gke.outputs.endpoint
   gke_hub_membership_name = dependency.gke.outputs.name
-  gke_hub_sa_name         = "gke-hub-sa"
+  gke_hub_sa_name         = "gke-hub-sa-${dependency.gke.outputs.name}"
   labels                  = "env=${local.environment_name},location=${dependency.gke.outputs.location}"
 
 }

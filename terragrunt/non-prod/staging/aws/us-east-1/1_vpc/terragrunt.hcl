@@ -52,7 +52,7 @@ locals {
 
 terraform {
 
-  source = "../../../../../../modules/aws/vpc"
+  source = "."
 }
 
 inputs = {
