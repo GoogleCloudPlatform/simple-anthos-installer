@@ -1,0 +1,32 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Creates GKE Clusters and regiters them with Anthos
+#In this directory, run the following command to build this builder.
+# $ gcloud builds submit . --config=cloudbuild-gke-dev-deploy.yaml --timeout=30m
+steps:
+  - name: 'gcr.io/${PROJECT_ID}/simple-anthos-build:latest'
+    id: 'deploy-dev-gcp'
+    args: ['run-all','apply','--terragrunt-non-interactive']
+    env:
+      - "TF_IN_AUTOMATION=1"
+      - "TF_INPUT=false"
+      - "TF_VAR_project_id=${PROJECT_ID}"
+      - "PROJECT_ID=${PROJECT_ID}"
+      - "ACM_REPO=${_ACM_REPO}"
+    dir: gcp
+substitutions:
+  # Fill in your ACM URL below and uncomment if you do not want to use --substitutions arg
+  #_ACM_REPO: git@your-git-server:git-repo/csp-config-management.git
+tags: ['cloud-builders-community']
