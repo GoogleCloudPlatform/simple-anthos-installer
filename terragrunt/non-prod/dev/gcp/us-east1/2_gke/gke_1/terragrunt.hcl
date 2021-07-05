@@ -47,7 +47,7 @@ locals {
 
 dependency "vpc" {
 
-  config_path = "../../1_vpc"
+  config_path = "../../../1_vpc"
 
   # Configure mock outputs for the `validate` command that are returned when there are no outputs available (e.g the
   # module hasn't been applied yet.

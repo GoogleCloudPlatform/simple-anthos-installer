@@ -12,14 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ */ # Set common variables for the region. This is automatically pulled in in the root terragrunt.hcl configuration to
+# configure the remote state bucket and pass forward to the child modules as inputs.
 
-# # Kubernetes provider
-# # https://learn.hashicorp.com/terraform/kubernetes/provision-eks-cluster#optional-configure-terraform-kubernetes-provider
-# # To learn how to schedule deployments and services using the provider, go here: https://learn.hashicorp.com/terraform/kubernetes/deploy-nginx-kubernetes
-
-provider "kubernetes" {
-  host                   = data.aws_eks_cluster.cluster.endpoint
-  token                  = data.aws_eks_cluster_auth.cluster.token
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+locals {
+  region             = "us-west1" # GCP Region
+  availability_zones = split(",", "us-west1-a,us-west1-b,us-west1-c")
 }

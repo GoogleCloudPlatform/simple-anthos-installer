@@ -43,14 +43,14 @@ locals {
   availability_zones = local.region_vars.locals.availability_zones
 
   #Subnets for GKE
-  subnet_01    = "${local.environment_name}-${local.region}-subnet-01"
+  subnet_02    = "${local.environment_name}-${local.region}-subnet-02"
   cluster_type = "gke"
 
 }
 
 dependency "vpc" {
 
-  config_path = "../1_vpc"
+  config_path = "../../../1_vpc"
 
   # Configure mock outputs for the `validate` command that are returned when there are no outputs available (e.g the
   # module hasn't been applied yet.
@@ -69,18 +69,18 @@ terraform {
 
 inputs = {
 
-  name              = "${local.cluster_type}-${local.environment_name}-01"
+  name              = "${local.cluster_type}-${local.environment_name}-02"
   regional          = true
   zones             = local.availability_zones
   network           = dependency.vpc.outputs.network_name
   subnetwork        = dependency.vpc.outputs.subnets_names[0]
-  ip_range_pods     = "${local.subnet_01}-secondary-range-01-pod"
-  ip_range_services = "${local.subnet_01}-secondary-range-02-svc"
+  ip_range_pods     = "${local.subnet_02}-secondary-range-01-pod"
+  ip_range_services = "${local.subnet_02}-secondary-range-02-svc"
   service_account   = "create"
   release_channel   = "REGULAR"
   node_pools = [
     {
-      name         = "${local.cluster_type}-${local.environment_name}-01-pool"
+      name         = "${local.cluster_type}-${local.environment_name}-02-pool"
       autoscaling  = false
       auto_upgrade = true
       node_count   = 1

@@ -32,8 +32,7 @@ locals {
   # Extract the variables we need for easy access
   project_id = local.account_vars.locals.project_id
   region     = local.region_vars.locals.region
-  aws_region = local.region_vars.locals.aws_region
-
+  
   environment_name = local.environment_vars.locals.environment_name
 }
 
@@ -56,11 +55,6 @@ generate "provider" {
       region = "${local.region}"
       project = "${local.project_id}"
       version = "~> 3.70"
-    }
-
-    provider "aws" {
-        version = ">= 2.28.1"
-        region  = "${local.aws_region}"
     }
 
     terraform {

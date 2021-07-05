@@ -69,19 +69,18 @@ terraform {
 
 inputs = {
 
-  name                  = "${local.cluster_type}-${local.environment_name}-02"
-  regional              = true
-  zones                 = local.availability_zones
-  network               = dependency.vpc.outputs.network_name
-  subnetwork            = dependency.vpc.outputs.subnets_names[0]
-  ip_range_pods         = "${local.subnet_01}-secondary-range-01-pod"
-  ip_range_services     = "${local.subnet_01}-secondary-range-03-svc" // Use 03 since 02 is first service raange starts from 02
-  service_account       = "create"
-  release_channel       = "REGULAR"
-  enable_shielded_nodes = true
+  name              = "${local.cluster_type}-${local.environment_name}-01"
+  regional          = true
+  zones             = local.availability_zones
+  network           = dependency.vpc.outputs.network_name
+  subnetwork        = dependency.vpc.outputs.subnets_names[0]
+  ip_range_pods     = "${local.subnet_01}-secondary-range-01-pod"
+  ip_range_services = "${local.subnet_01}-secondary-range-02-svc"
+  service_account   = "create"
+  release_channel   = "REGULAR"
   node_pools = [
     {
-      name         = "${local.cluster_type}-${local.environment_name}-02-pool"
+      name         = "${local.cluster_type}-${local.environment_name}-01-pool"
       autoscaling  = false
       auto_upgrade = true
       node_count   = 1

@@ -29,53 +29,38 @@ generate "backend" {
 }
 
 
-locals {
+dependency "gke" {
 
-  # Automatically load project-level variables
-  account_vars = read_terragrunt_config(find_in_parent_folders("account.hcl"))
-
-  # Automatically load region-level variables
-  region_vars = read_terragrunt_config(find_in_parent_folders("region.hcl"))
-
-  # Automatically load environment-level variables
-  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-
-  environment_name = local.environment_vars.locals.environment_name
-
-  aws_region = local.region_vars.locals.aws_region
-  #Get the GCP project ID
-  project_id = local.account_vars.locals.project_id
-
-}
-
-dependency "vpc" {
-
-  config_path = "../1_vpc"
+  config_path = "../../2_gke/gke_1"
 
   # Configure mock outputs for the `validate` command that are returned when there are no outputs available (e.g the
   # module hasn't been applied yet.
   mock_outputs_allowed_terraform_commands = ["validate"]
   mock_outputs = {
-
-    private_subnets = ["fake"]
-    vpc_id          = ["fake"]
+    name     = "fake"
+    location = "fake"
+    endpoint = "fake"
   }
+}
+
+dependencies {
+  paths = ["../../3_hub_connect/gke_1", "../../4_acm/gke_1"]
 }
 
 terraform {
 
-  source = "."
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/asm?ref=v15.0.0"
+
 
 }
 
+
 inputs = {
 
-  aws_region = local.aws_region
-  #Include the GCP project name in naming the resources so we know which GCP project created it
-  cluster_name    = "eks-${local.environment_name}-01"
-  vpc_id          = dependency.vpc.outputs.vpc_id
-  private_subnets = dependency.vpc.outputs.private_subnets
-  additional_tags = { env = "${local.environment_name}"
-    gke-project = "${local.project_id}"
-  }
+  cluster_name     = dependency.gke.outputs.name
+  location         = dependency.gke.outputs.location
+  cluster_endpoint = dependency.gke.outputs.endpoint
+  enable_all       = true
+  asm_version      = "1.9"
+
 }

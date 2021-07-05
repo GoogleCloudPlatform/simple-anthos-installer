@@ -27,16 +27,11 @@ generate "backend" {
     }
   EOF
 }
-locals {
-  # Automatically load environment-level variables
-  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  environment_name = local.environment_vars.locals.environment_name
-}
 
 
 dependency "gke" {
 
-  config_path = "../2_gke"
+  config_path = "../../2_gke/gke_1"
 
   # Configure mock outputs for the `validate` command that are returned when there are no outputs available (e.g the
   # module hasn't been applied yet.
@@ -48,20 +43,28 @@ dependency "gke" {
   }
 }
 
+dependencies {
+  paths = ["../../3_hub_connect/gke_1"]
+}
+
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/hub?ref=v15.0.0"
+  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/acm?ref=v15.0.0"
+
+
 }
 
 
 inputs = {
 
 
-  cluster_name            = dependency.gke.outputs.name
-  location                = dependency.gke.outputs.location
-  cluster_endpoint        = dependency.gke.outputs.endpoint
-  gke_hub_membership_name = dependency.gke.outputs.name
-  gke_hub_sa_name         = "gke-hub-sa-${dependency.gke.outputs.name}"
-  labels                  = "env=${local.environment_name},location=${dependency.gke.outputs.location}"
+  cluster_name     = dependency.gke.outputs.name
+  location         = dependency.gke.outputs.location
+  cluster_endpoint = dependency.gke.outputs.endpoint
+
+  # Looks at the ACM_REPO env to get the git URL for config sync. If not found defaults to empty string. 
+  sync_repo   = get_env("ACM_REPO", "")
+  sync_branch = "1.0.0"
+  policy_dir  = "foo-corp"
 
 }

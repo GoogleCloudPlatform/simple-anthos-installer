@@ -44,7 +44,12 @@ locals {
   region = local.region_vars.locals.region
 
   #Subnets for GKE
+  # gke-01
   subnet_01 = "${local.environment_name}-${local.region}-subnet-01"
+
+  # gke-02
+  subnet_02 = "${local.environment_name}-${local.region}-subnet-02"
+
 }
 
 terraform {
@@ -66,31 +71,37 @@ inputs = {
     {
       subnet_name           = "${local.subnet_01}"
       subnet_ip             = "10.4.0.0/22"
-      subnet_region         = "${local.region}"
+      subnet_region         = "us-east1"
       subnet_private_access = "true"
+      description           = "This subnet is managed by Terraform"
+    },
+    {
+      subnet_name           = "${local.subnet_02}"
+      subnet_ip             = "10.5.0.0/22"
+      subnet_region         = "us-west1"
+      subnet_private_access = "true"
+      description           = "This subnet is managed by Terraform"
     },
   ]
   secondary_ranges = {
     "${local.subnet_01}" = [
       {
         range_name    = "${local.subnet_01}-secondary-range-01-pod"
-        ip_cidr_range = "10.0.0.0/14"
+        ip_cidr_range = "192.168.0.0/18"
       },
       {
         range_name    = "${local.subnet_01}-secondary-range-02-svc"
-        ip_cidr_range = "10.5.0.0/20"
+        ip_cidr_range = "192.168.64.0/18"
+      },
+    ],
+    "${local.subnet_02}" = [
+      {
+        range_name    = "${local.subnet_02}-secondary-range-01-pod"
+        ip_cidr_range = "192.168.0.0/18"
       },
       {
-        range_name    = "${local.subnet_01}-secondary-range-03-svc"
-        ip_cidr_range = "10.5.16.0/20"
-      },
-      {
-        range_name    = "${local.subnet_01}-secondary-range-04-svc"
-        ip_cidr_range = "10.5.32.0/20"
-      },
-      {
-        range_name    = "${local.subnet_01}-secondary-range-05-svc"
-        ip_cidr_range = "10.5.48.0/20"
+        range_name    = "${local.subnet_02}-secondary-range-02-svc"
+        ip_cidr_range = "192.168.64.0/18"
       },
     ]
   }

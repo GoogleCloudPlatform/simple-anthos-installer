@@ -32,35 +32,54 @@ generate "backend" {
 
 locals {
 
-  # Automatically load project-level variables
-  account_vars = read_terragrunt_config(find_in_parent_folders("account.hcl"))
-
   # Automatically load region-level variables
   region_vars = read_terragrunt_config(find_in_parent_folders("region.hcl"))
-
-
 
   # Automatically load environment-level variables
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
 
+
   environment_name = local.environment_vars.locals.environment_name
 
-  aws_region = local.region_vars.locals.aws_region
-  #Get the GCP project ID
-  project_id = local.account_vars.locals.project_id
+  region = local.region_vars.locals.region
+
+  #Subnets for GKE
+  subnet_01 = "${local.environment_name}-${local.region}-subnet-01"
 }
 
 terraform {
 
-  source = "."
+  source = "github.com/terraform-google-modules/terraform-google-network?ref=v3.3.0"
 }
+
+dependencies {
+  paths = ["../0_activate-apis"]
+}
+
 
 inputs = {
 
-  #Include the GCP project name in naming the resources so we know which GCP project created it
-  environment_name = "${local.environment_name}-gcp:${local.project_id}"
-  additional_tags = { env = local.environment_name
-    createdByGCPProject = local.project_id
-  }
+  network_name = "${local.environment_name}-vpc"
+  routing_mode = "REGIONAL"
 
+  subnets = [
+    {
+      subnet_name           = "${local.subnet_01}"
+      subnet_ip             = "10.4.0.0/22"
+      subnet_region         = "${local.region}"
+      subnet_private_access = "true"
+    },
+  ]
+  secondary_ranges = {
+    "${local.subnet_01}" = [
+      {
+        range_name    = "${local.subnet_01}-secondary-range-01-pod"
+        ip_cidr_range = "192.168.0.0/18"
+      },
+      {
+        range_name    = "${local.subnet_01}-secondary-range-02-svc"
+        ip_cidr_range = "192.168.64.0/18"
+      },
+    ]
+  }
 }
