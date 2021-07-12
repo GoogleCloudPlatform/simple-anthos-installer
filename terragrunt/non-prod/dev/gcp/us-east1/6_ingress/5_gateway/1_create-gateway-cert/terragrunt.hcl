@@ -18,6 +18,15 @@ include {
   path = find_in_parent_folders()
 }
 
+
+locals {
+  # Automatically load project-level variables
+  account_vars     = read_terragrunt_config(find_in_parent_folders("account.hcl"))
+  project_id       = local.account_vars.locals.project_id
+  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  environment_name = local.environment_vars.locals.environment_name
+}
+
 generate "backend" {
   path      = "backend.tf"
   if_exists = "overwrite"
@@ -29,39 +38,25 @@ generate "backend" {
 }
 
 
-dependency "gke" {
-
-  config_path = "../../2_gke/gke_1"
-
-  # Configure mock outputs for the `validate` command that are returned when there are no outputs available (e.g the
-  # module hasn't been applied yet.
-  mock_outputs_allowed_terraform_commands = ["validate"]
-  mock_outputs = {
-    name     = "fake"
-    location = "fake"
-    endpoint = "fake"
-  }
-}
-
 dependencies {
-  paths = ["../../3_hub_connect/gke_1", "../../4_acm/gke_1"]
+  paths = ["../../4_acm/gke_1"]
 }
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/asm?ref=v15.0.0"
-
-
+  source = "."
 }
 
 
 inputs = {
 
-  cluster_name     = dependency.gke.outputs.name
-  location         = dependency.gke.outputs.location
-  cluster_endpoint = dependency.gke.outputs.endpoint
-  custom_overlays  = ["./ingress-backendconfig-operator.yaml"]
-  enable_all       = true
-  asm_version      = "1.10"
+  name                  = "self-signed-ingress-gateway-cert"
+  validity_period_hours = 9552 # Max life of TLS cert is 398 days
+  ca_common_name        = "Self signed CA for mesh ingress gateway"
+  organization_name     = "Simple_Anthos-Installer"
+  common_name           = "${local.environment_name}-frontend.endpoints.${local.project_id}.cloud.goog"
+  #dns_names             = var.dns_names
+  #ip_addresses          = var.ip_addresses
+  download_certs = true
 
 }

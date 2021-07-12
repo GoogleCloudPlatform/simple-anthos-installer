@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: whereami-configmap
+data:
+  BACKEND_ENABLED: "False" # flag to enable backend service call "False" || "True"
+  # when defining the BACKEND_SERVICE using an HTTP protocol, indicate HTTP or HTTPS; if using gRPC, use the host name only
+  BACKEND_SERVICE: "http://whereami-backend" # substitute with corresponding service name - this example assumes both services are in the same namespace  
+  METADATA:        "frontend" # arbitrary string that gets returned in payload - can be used to track which services you're interacting with 
+  ECHO_HEADERS:    "False" # flag to enable the payload including all headers received in the `echo_headers` field if set to "True"
+  GRPC_ENABLED:    "False" # flag to switch whereami service to gRPC mode

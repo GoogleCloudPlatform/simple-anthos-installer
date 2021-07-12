@@ -32,7 +32,7 @@ locals {
   # Extract the variables we need for easy access
   project_id = local.account_vars.locals.project_id
   region     = local.region_vars.locals.region
-  
+
   environment_name = local.environment_vars.locals.environment_name
 }
 

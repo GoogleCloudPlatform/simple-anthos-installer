@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whereami
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: whereami
+  template:
+    metadata:
+      labels:
+        app: whereami
+        version: v1
+    spec:
+      serviceAccountName: whereami-ksa
+      containers:
+      - name: whereami
+        image: gcr.io/google-samples/whereami:v1.2.1
+        ports:
+          - name: http
+            containerPort: 8080
+        livenessProbe:
+          httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+        env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: POD_SERVICE_ACCOUNT
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.serviceAccountName
+          - name: BACKEND_ENABLED
+            valueFrom:
+              configMapKeyRef:
+                name: whereami-configmap
+                key: BACKEND_ENABLED
+          - name: BACKEND_SERVICE
+            valueFrom:
+              configMapKeyRef:
+                name: whereami-configmap
+                key: BACKEND_SERVICE
+          - name: METADATA
+            valueFrom:
+              configMapKeyRef:
+                name: whereami-configmap
+                key: METADATA
+          - name: ECHO_HEADERS
+            valueFrom:
+              configMapKeyRef:
+                name: whereami-configmap
+                key: ECHO_HEADERS
+          - name: GRPC_ENABLED
+            valueFrom:
+              configMapKeyRef:
+                name: whereami-configmap
+                key: GRPC_ENABLED

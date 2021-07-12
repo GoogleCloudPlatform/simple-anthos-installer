@@ -34,6 +34,10 @@ locals {
 
   # Automatically load region-level variables
   region_vars = read_terragrunt_config(find_in_parent_folders("region.hcl"))
+  region_1    = local.region_vars.locals.region
+
+  # The second region 
+  region_2 = "us-west1"
 
   # Automatically load environment-level variables
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
@@ -41,7 +45,7 @@ locals {
 
   environment_name = local.environment_vars.locals.environment_name
 
-  region = local.region_vars.locals.region
+
 
   #Subnets for GKE
   # gke-01
@@ -71,14 +75,14 @@ inputs = {
     {
       subnet_name           = "${local.subnet_01}"
       subnet_ip             = "10.4.0.0/22"
-      subnet_region         = "us-east1"
+      subnet_region         = "${local.region_1}"
       subnet_private_access = "true"
       description           = "This subnet is managed by Terraform"
     },
     {
       subnet_name           = "${local.subnet_02}"
       subnet_ip             = "10.5.0.0/22"
-      subnet_region         = "us-west1"
+      subnet_region         = "${local.region_2}"
       subnet_private_access = "true"
       description           = "This subnet is managed by Terraform"
     },

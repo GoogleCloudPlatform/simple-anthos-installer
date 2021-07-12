@@ -17,6 +17,8 @@ crash.log
 **/*_override.tf.json
 
 **/*.pem
+**/*.crt
+**/*.key
 **/*.pem.pub
 
 # Ignore platform automation's default output

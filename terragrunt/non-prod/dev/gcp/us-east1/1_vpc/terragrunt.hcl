@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 # Include all settings from the root terragrunt.hcl file
 include {
   path = find_in_parent_folders()
@@ -33,42 +34,49 @@ locals {
 
   # Automatically load region-level variables
   region_vars = read_terragrunt_config(find_in_parent_folders("region.hcl"))
+  region      = local.region_vars.locals.region
 
   # Automatically load environment-level variables
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-
-
   environment_name = local.environment_vars.locals.environment_name
 
-  region = local.region_vars.locals.region
-
+  #Subnets for GKE
+  subnet_01 = "${local.environment_name}-${local.region}-subnet-01"
 }
-
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-project-factory//modules/project_services?ref=v10.1.1"
+  source = "github.com/terraform-google-modules/terraform-google-network?ref=v3.3.0"
 }
 
+dependencies {
+  paths = ["../0_activate-apis"]
+}
+
+
 inputs = {
-  disable_services_on_destroy = false
-  activate_apis = [
-    "compute.googleapis.com",
-    "iam.googleapis.com",
-    "container.googleapis.com",
-    "cloudresourcemanager.googleapis.com",
-    "anthos.googleapis.com",
-    "cloudtrace.googleapis.com",
-    "meshca.googleapis.com",
-    "meshtelemetry.googleapis.com",
-    "meshconfig.googleapis.com",
-    "iamcredentials.googleapis.com",
-    "gkeconnect.googleapis.com",
-    "gkehub.googleapis.com",
-    "monitoring.googleapis.com",
-    "logging.googleapis.com",
-    "stackdriver.googleapis.com"
 
+  network_name = "${local.environment_name}-vpc"
+  routing_mode = "REGIONAL"
+
+  subnets = [
+    {
+      subnet_name           = "${local.subnet_01}"
+      subnet_ip             = "10.4.0.0/22"
+      subnet_region         = "${local.region}"
+      subnet_private_access = "true"
+    },
   ]
-
+  secondary_ranges = {
+    "${local.subnet_01}" = [
+      {
+        range_name    = "${local.subnet_01}-secondary-range-01-pod"
+        ip_cidr_range = "192.168.0.0/18"
+      },
+      {
+        range_name    = "${local.subnet_01}-secondary-range-02-svc"
+        ip_cidr_range = "192.168.64.0/18"
+      },
+    ]
+  }
 }

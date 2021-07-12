@@ -1,0 +1,15 @@
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: ingress-backendconfig
+  namespace: istio-system
+spec:
+  healthCheck:
+    requestPath: /healthz/ready
+    port: 15021
+    type: HTTP
+#  To enable Cloud Armor (DDoS and XSS) uncomment below lines
+#  and create edge-fw-policy by running commands detailed 
+#  here: https://cloud.google.com/architecture/exposing-service-mesh-apps-through-gke-ingress#define_security_policies
+  #securityPolicy: 
+      #name: edge-fw-policy

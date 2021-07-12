@@ -1,0 +1,5 @@
+resources:
+- ksa.yaml
+- deployment.yaml
+- service.yaml
+- configmap.yaml

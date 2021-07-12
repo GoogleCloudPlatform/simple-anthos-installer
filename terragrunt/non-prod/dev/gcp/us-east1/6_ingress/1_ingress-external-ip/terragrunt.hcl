@@ -18,6 +18,17 @@ include {
   path = find_in_parent_folders()
 }
 
+
+locals {
+  # Automatically load project-level variables
+  
+  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  environment_name = local.environment_vars.locals.environment_name
+  region_vars      = read_terragrunt_config(find_in_parent_folders("region.hcl"))
+  region           = local.region_vars.locals.region
+
+}
+
 generate "backend" {
   path      = "backend.tf"
   if_exists = "overwrite"
@@ -28,40 +39,16 @@ generate "backend" {
   EOF
 }
 
-
-dependency "gke" {
-
-  config_path = "../../2_gke/gke_1"
-
-  # Configure mock outputs for the `validate` command that are returned when there are no outputs available (e.g the
-  # module hasn't been applied yet.
-  mock_outputs_allowed_terraform_commands = ["validate"]
-  mock_outputs = {
-    name     = "fake"
-    location = "fake"
-    endpoint = "fake"
-  }
-}
-
-dependencies {
-  paths = ["../../3_hub_connect/gke_1", "../../4_acm/gke_1"]
-}
-
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine//modules/asm?ref=v15.0.0"
-
+  source = "github.com/terraform-google-modules/terraform-google-address?ref=v3.0.0"
 
 }
 
 
 inputs = {
 
-  cluster_name     = dependency.gke.outputs.name
-  location         = dependency.gke.outputs.location
-  cluster_endpoint = dependency.gke.outputs.endpoint
-  custom_overlays  = ["./ingress-backendconfig-operator.yaml"]
-  enable_all       = true
-  asm_version      = "1.10"
-
+  names        = ["${local.environment_name}-ingress-ip"]
+  region       = local.region
+  address_type = "EXTERNAL"
 }
