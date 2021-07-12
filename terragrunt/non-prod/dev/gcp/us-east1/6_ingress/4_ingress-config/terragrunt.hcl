@@ -67,11 +67,10 @@ dependency "ingress-cert" {
   }
 }
 
-# Create the kustomize file to apply to base config with DNS name and managed certificate name
-# This follows automates the following step https://cloud.google.com/architecture/exposing-service-mesh-apps-through-gke-ingress#deploy_the_ingress_resource
+# Create the kustomize file to apply to base config with LB IP address and managed certificate name
+# This code automates the following step https://cloud.google.com/architecture/exposing-service-mesh-apps-through-gke-ingress#deploy_the_ingress_resource
 # Except we are using networking.gke.io/pre-shared-cert tag instead of networking.gke.io/managed-certificates 
 # See this github issue here for more info: https://github.com/hashicorp/terraform-provider-kubernetes/issues/446
-
 generate "kustomize_ingress" {
   path      = "configs/ingress-kustomize.yaml"
   if_exists = "overwrite"

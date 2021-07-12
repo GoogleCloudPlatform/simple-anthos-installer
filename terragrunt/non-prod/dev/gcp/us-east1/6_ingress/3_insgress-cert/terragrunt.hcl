@@ -46,7 +46,7 @@ dependency "ingress-dns" {
   # module hasn't been applied yet.
   mock_outputs_allowed_terraform_commands = ["validate"]
   mock_outputs = {
-    name     = "fake"
+    endpoint     = "fake"
   }
 }
 
@@ -60,6 +60,6 @@ inputs = {
 
   project = local.project_id
   name   = "${local.environment_name}-gke-ingress-cert"
-  domain = dependency.ingress-dns.outputs.name
+  domain = dependency.ingress-dns.outputs.endpoint
 
 }
