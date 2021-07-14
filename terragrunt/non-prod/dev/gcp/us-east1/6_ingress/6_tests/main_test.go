@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAnthosServiceMesh(t *testing.T) {
+func TestIngress(t *testing.T) {
 	t.Parallel()
 
 	//Setup the kubectl config and context.
@@ -50,6 +50,7 @@ func TestAnthosServiceMesh(t *testing.T) {
 			Command: "bash",
 			Args:    []string{"-c", get_pod_count},
 		}
+		// Return if the pod count is 2 of 2
 		pod_count := shell.RunCommandAndGetOutput(t, pod_count_cmd)
 		if pod_count == "2/2" {
 			return pod_count, nil
@@ -60,18 +61,19 @@ func TestAnthosServiceMesh(t *testing.T) {
 
 	assert.Equal(t, pod_count, "2/2")
 
+	// Verify that Ingress exists in the istio-system namespace
 	istio_options := k8s.NewKubectlOptions("", "", "istio-system")
 	ingress := k8s.GetIngress(t, istio_options, "gke-ingress")
 	assert.True(t, k8s.IsIngressAvailable(ingress), "Ingress not available")
 
+	// Get the load Balancer IP
 	ingress_endpoint := ingress.Status.LoadBalancer.Ingress[0].IP
 
 	if assert.NotEmpty(t, ingress_endpoint) {
 		//service := k8s.GetService(t, options, "whereami-frontend")
 		url := fmt.Sprintf("http://%s", ingress_endpoint)
 		http_helper.HttpGetWithRetryWithCustomValidation(t, url, nil, 30, 1*time.Second, func(status int, body string) bool {
-			assert.True(t, status == 200)
-			assert.True()
+			return status == 200
 		})
 	}
 
@@ -99,12 +101,5 @@ func enableSidecarProxyInjection(t *testing.T) {
 
 	// Enable sidecar injection by runnning: kubectl label namespace default istio-injection-  istio.io/rev=asm-label --overwrite
 	k8s.RunKubectlE(t, empty_options, "label", "namespace", "default", "istio-injection-", label_to_apply, "--overwrite")
-	k8s.
-}
-
-func TestAnthosConfigManagement(t *testing.T) {
-	t.Parallel()
-
-	// checknamespaces
 
 }

@@ -54,7 +54,11 @@ dependency "gke" {
 dependency "gateway_cert" {
 
   config_path = "../1_create-gateway-cert"
-
+  mock_outputs_allowed_terraform_commands = ["validate"]
+  mock_outputs = {
+    ca_private_key_pem     = "fake"
+    ca_cert_pem = "fake"
+  }
 
 }
 

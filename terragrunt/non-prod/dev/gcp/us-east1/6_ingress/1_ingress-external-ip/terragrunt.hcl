@@ -41,7 +41,7 @@ generate "backend" {
 
 terraform {
 
-  source = "github.com/terraform-google-modules/terraform-google-address?ref=v3.0.0"
+  source = "github.com/terraform-google-modules/terraform-google-address?ref=v2.1.1"
 
 }
 
@@ -49,6 +49,6 @@ terraform {
 inputs = {
 
   names        = ["${local.environment_name}-ingress-ip"]
-  region       = local.region
-  address_type = "EXTERNAL"
+  //region       = local.region
+  global = true
 }

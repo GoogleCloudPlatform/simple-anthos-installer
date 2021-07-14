@@ -18,6 +18,13 @@ include {
   path = find_in_parent_folders()
 }
 
+locals {
+  # Automatically load project-level variables
+ 
+  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  environment_name = local.environment_vars.locals.environment_name
+}
+
 generate "backend" {
   path      = "backend.tf"
   if_exists = "overwrite"
@@ -55,17 +62,6 @@ dependency "ingress-external-ip" {
   }
 }
 
-dependency "ingress-cert" {
-
-  config_path = "../3_insgress-cert"
-
-  # Configure mock outputs for the `validate` command that are returned when there are no outputs available (e.g the
-  # module hasn't been applied yet.
-  mock_outputs_allowed_terraform_commands = ["validate"]
-  mock_outputs = {
-    name     = "fake"
-  }
-}
 
 # Create the kustomize file to apply to base config with LB IP address and managed certificate name
 # This code automates the following step https://cloud.google.com/architecture/exposing-service-mesh-apps-through-gke-ingress#deploy_the_ingress_resource
@@ -78,11 +74,11 @@ generate "kustomize_ingress" {
   apiVersion: networking.k8s.io/v1
   kind: Ingress
   metadata:
-  name: gke-ingress
-  namespace: istio-system
-  annotations:
-    kubernetes.io/ingress.global-static-ip-name: "${dependency.ingress-external-ip.outputs.addresses[0]}"
-    networking.gke.io/pre-shared-cert: "${dependency.ingress-cert.outputs.name}"
+    name: gke-ingress
+    namespace: istio-system
+    annotations:
+      kubernetes.io/ingress.global-static-ip-name: "${dependency.ingress-external-ip.outputs.names[0]}"
+      networking.gke.io/managed-certificates: "${local.environment_name}-gke-ingress-cert"
 EOF
 }
 

@@ -55,8 +55,6 @@ inputs = {
   ca_common_name        = "Self signed CA for mesh ingress gateway"
   organization_name     = "Simple_Anthos-Installer"
   common_name           = "${local.environment_name}-frontend.endpoints.${local.project_id}.cloud.goog"
-  #dns_names             = var.dns_names
-  #ip_addresses          = var.ip_addresses
   download_certs = true
 
 }

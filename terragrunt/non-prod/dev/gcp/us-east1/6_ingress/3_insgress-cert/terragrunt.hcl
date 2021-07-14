@@ -21,8 +21,7 @@ include {
 
 locals {
   # Automatically load project-level variables
-  account_vars     = read_terragrunt_config(find_in_parent_folders("account.hcl"))
-  project_id       = local.account_vars.locals.project_id
+ 
   environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   environment_name = local.environment_vars.locals.environment_name
 }
@@ -37,6 +36,19 @@ generate "backend" {
   EOF
 }
 
+dependency "gke" {
+
+  config_path = "../../2_gke/gke_1"
+
+  # Configure mock outputs for the `validate` command that are returned when there are no outputs available (e.g the
+  # module hasn't been applied yet.
+  mock_outputs_allowed_terraform_commands = ["validate"]
+  mock_outputs = {
+    name     = "fake"
+    location = "fake"
+    endpoint = "fake"
+  }
+}
 
 dependency "ingress-dns" {
 
@@ -50,16 +62,34 @@ dependency "ingress-dns" {
   }
 }
 
+generate "kustomize_ingress" {
+  path      = "managed-cert.yaml"
+  if_exists = "overwrite"
+  contents = <<EOF
+  apiVersion: networking.gke.io/v1beta2
+  kind: ManagedCertificate
+  metadata:
+    name: ${local.environment_name}-gke-ingress-cert
+    namespace: istio-system
+  spec:
+    domains:
+      - "${dependency.ingress-dns.outputs.endpoint}"
+EOF
+}
+
 terraform {
 
-  source = "."
+   source = "github.com/terraform-google-modules/terraform-google-gcloud//modules/kubectl-wrapper?ref=v3.0.0"
+
 }
 
 
 inputs = {
 
-  project = local.project_id
-  name   = "${local.environment_name}-gke-ingress-cert"
-  domain = dependency.ingress-dns.outputs.endpoint
+  cluster_name     = dependency.gke.outputs.name
+  cluster_location = dependency.gke.outputs.location
+
+  kubectl_create_command  = "kubectl apply -f managed-cert.yaml"
+  kubectl_destroy_command = "kubectl delete -f managed-cert.yaml"
 
 }
